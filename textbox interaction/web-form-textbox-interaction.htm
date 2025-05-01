@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <title>Text Boxes</title>
+        <!-- JavaScript handles STRINGS and ARRAYS -->
+        <script>
+            function addfive(whichcontrol){
+                if(whichcontrol.value.length==0){
+                    add5.innerHTML="";
+                    multbutt.disabled=true;
+                    return true;
+                }
+                else{
+                    add5.innerHTML=parseFloat(whichcontrol.value)+5;
+                    multbutt.disabled=false;
+                    return true;
+                }
+            }
+            function checkcomplex(whichcontrol,errormsgfield){
+                var passcheck=true;
+                var x=0;
+                if(whichcontrol.value.length==0){
+                    errormsgfield.innerHTML="";
+                    return true;
+                }
+                else{
+                    // value 0-9 set of 3 dash
+                    var myregex=new RegExp('[0-9]{3}-[0-9]{2}-[0-9]{4}');
+                    passcheck=myregex.test(whichcontrol.value);
+                }
+                if(passcheck){
+                    errormsgfield.innerHTML="";
+                }
+                else{
+                    errormsgfield.innerHTML="Must be of the form 999-99-999!";
+                }
+                return passcheck;
+
+            }
+            function multbyfive(whichcontrol){
+                if(whichcontrol.value.length==0)
+                    mult5.innerHTML="";
+                else
+                    mult5.innerHTML=parseFloat(whichcontrol.value)*5;
+            }
+        </script>
+        <style>
+            .labelsection{
+                display:inline-block;
+                font-weight:bold;
+                text-align:right;
+                width:300px;
+            }
+
+            .datasection{
+                display:inline-block;
+            }
+
+            .errorsection{
+                display:inline-block;
+                color:red;
+            }
+
+        </style>
+    </head>
+    <body>
+        <form>
+            <div class="labelsection">
+                <label for="numberthing">Some kind of number:</label>
+            </div>
+            <div class="datasection">
+                <input type="number" id="numberthing" onblur="addfive(numberthing)" onkeyup="addfive(numberthing)"/>
+            </div><br>
+
+            <div class="labelsection">
+                Add 5 to numberthing:
+            </div>
+            <div class="datasection">
+                <span id="add5"></span>
+            </div><br>
+
+            <div class="labelsection">
+                Times numberthing by 5:
+            </div>
+            <div class="datasection">
+                <button type="button" id="multbutt" name="multbutt" accesskey="m" onclick="multbyfive(numberthing)" disabled>
+                <span style="text-decoration:underline">M</span>ultiply by 5</button>
+                <span id="mult5"></span>
+            </div><br>
+
+            <div class="labelsection">
+                <label for="idthing" >Thing with format 999-99-999:</label>
+            </div>
+            <div class="datasection">
+                <input type="text" id="idthing" name="idthing" onblur="checkcomplex(idthing,formaterror)" onkeyup="checkcomplex(idthing,formaterror)"   />
+                <span id="formaterror" class="errorsection" onblur="checkcomplex(formaterror)" onkeyup="checkcomplex(formaterror)" ></span>
+            </div><br>
+
+            <div class="labelsection">
+                <label for="datething">Textbox that does dates:</label>
+            </div>
+                <div class="datasection">
+                <input type="date" id="datething" />
+            </div><br>
+
+            <div class="labelsection">
+                <label for="emailthing">Textbox that does emails:</label>
+            </div>
+                <div class="datasection">
+                <input type="email" id="emailthing" />
+            </div><br>
+
+
+        </form>
+    </body>
+</html>
