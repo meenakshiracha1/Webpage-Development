@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+    <head>
+        <Title>On your Own</Title>
+        <style>
+            .body{position: absolute;
+                display:flex;
+                flex-flow:row;
+            }
+           
+            /* Left Bar CSS */
+            .leftbar a:hover{
+            font-weight:bold;
+            }
+            .leftbar a:active{font-size:30px;}
+            .leftbar {
+                border:2px;
+                width:200px;
+                left:0;
+                top:0;
+                bottom:0;
+                position:fixed;
+                background:gold;
+            }
+
+
+            /* Main Section CSS */
+            .mainsection h1{color:blue;
+            text-align:center;}
+            table,th,td{border: 1px solid black;
+            border-collapse:collapse}
+
+            .mainsection h2{color:blue}
+            img{
+                display:block;
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+            .mainsection{
+                
+                flex-grow:1;
+                padding: 10px;
+                top:0;
+                bottom:0;
+                text-align:justify;
+                left:250px;
+                position: absolute;
+            }
+
+            /* Right Bar CSS */
+            .rightbar{border:1px ;
+            width:400px;
+            right:0;
+            top:0;
+            bottom:0;
+            position:fixed;
+            background:lightsteelblue;
+            }
+            .rightbar a:hover{font-style:italic}         
+            
+        </style>
+    </head>
+
+    <body>
+        <div class="body">
+        <div class="leftbar">
+            <ul>
+                <li><a href="#top">To the top</a></li>
+                <li><a href="#micro">Microcontroller single boards</a></li>
+                <ul>
+                    <li><a href="#figure1">Figure 1</a></li>
+                    <li><a href="#figure2">Figure 2</a></li>
+                </ul>
+                <li><a href="#single">Single board computers</a></li>
+                <ul>
+                    <li><a href="#figure3">Figure 3</a></li>
+                </ul>
+            <ul>
+        </div>
+
+
+        <div class="mainsection">
+            <h1 id="top" >Programmable Hardware: Single-Board Devices</h1>
+            <p>Most Internet of Things prototyping will center around the single-board.  The personal computer is centered around the mother board, on                    which we seat a central processing unit and any co-processors.  We then connect peripherals like volatile memory, disks, and networking                    using expansion slots to the motherboard via the various buses. <br/><br/> With Internet of Things, all the computational hardware is                      typically physically located onto a single board that is often of a size comparable to a credit card or smaller.  The definition of                        single-board encompasses both network-enabled single-boards and non-network-enabled single-boards.  Given this paper                                       focuses on Internet of Things, the assumption is the boards have or can be provided with networking capability.<br/><br/>                                  Single-boards can broadly be divided into two classes-single-board microcontrollers and single-board computers as summarized in the table                  below.
+            </p>
+            <table >
+                <tr>
+                    <th></th>
+                    <th style="text-size:bold;">Microcontroller</th>
+                    <th style="text-size:bold">Computer</th>
+                </tr>
+                <tr>
+                    <th style="text-size:bold;" > Typical Use</th>
+                    <td>Manipulate electronic components that  produce/require simple data types</td>
+                    <td>Manipulate electronic components that  produce/require complex/multimedia data types</td>
+                </tr>
+                <tr>
+                    <th style="text-size:bold">Operating Process</th>
+                    <td>Initialize and Loop</td>
+                    <td>Boots through an Operating System</td>
+                </tr>
+                <tr>
+                    <th style="text-size:bold">Peripherals</th>
+                    <td>Often,none</td>
+                    <td>Often,required</td>
+                </tr>
+            </table>
+
+            <h2 id="micro">Microcontroller Single-Boards</h2>
+            <p>Microcontroller single-boards are relatively simple programmable Internet of Things components.  The typical microcontroller single-board comes with the following components: (1) the microcontroller, (2) a chip that enables network connection, (3) general purpose input-output (GPIO) pins to connect the microcontroller board to other electronic circuits, (4) a USB connector to upload code to the board and for diagnostics and debugging, and (5) associated secondary components (e.g., diagnostic light emitting diodes- LEDs).</p>
+            <img src="Picture1.png" id="figure1" width="800px;" "text-align:center;" alt="Figure 1">
+            <p style="text-align:center">Figure 1: An Arduino MKR 1000 Microcontroller Single-Board</p>
+            <p>It is possible to use microcontroller single-boards that do not have on-board networking for Internet of Things development.  Networking can be added by soldering on networking chips like the ESP 32 or ESP 8266.  Alternately, some microcontroller single-boards are expandable.  For example, the non-network enabled boards sold by Arduino can be upgraded through the purchase of shields, including a shield that provides networking capability.<br><br>
+A GPIO pin is the single-board equivalent of an expansion slot.  One connects a circuit component to the GPIO pin either directly, or with a wire.  There are two kinds of GPIO pins- female and male pins.  A female pin is fundamentally a hole which allows for the insertion of a wire.  A male pin is a metal pin that is to be inserted into a female connector.  A particular pin can be male, female, or have both male and female connectors.<br><br>
+The particular GPIO pins on a single-board can have generic or specific capabilities.  A generic GPIO pin could be used to read or output either a digital signal (i.e., an electrical current that has only a low or high state) or an analog signal (i.e., an electrical current where the voltage can vary within a range).  A GPIO pin with specific capabilities will be linked to a particular function on the single-board.  For example, GPIO pins 14 and 13 on the Arduino MKR 1000 are the transmit and receive pins.  They are linked to the WiFi chip such that one can use them to read or write WiFi signals.<br><br>
+<a href="#figure1">Figure 1</a> presents a typical IoT microcontroller single-board, the Arduino MKR 1000.  The core of the Arduino MKR 1000 is the Atmel ATSAMW25 SoC (System on Chip), which combines the microcontroller, WiFi module and an encryption module into a single chip.  The MKR 1000 has a total of 28 GPIO pins, all of which have a female and male connector.  All the GPIO pins have their own specialized functions.  For example, 15 of the pins are digital pins, capable of either reading or outputting a digital signal.  Seven of the pins are analog pins, capable of reading signals of various strengths, etc. One of the pins is the ground pin used to earth circuits, while another is the steady power pin that provides a continuous flow of current that is important for some circuits.  The MKR 1000 also has a USB-C connector, which is principally used to connect the MKR 1000 to a computer.  One can then upload code from the computer to the MKR 1000 and have the MKR 1000 send diagnostic information to the computer.  Finally, additional components are soldered to the MKR 1000, including various light emitting diodes, a JST connector for a rechargeable battery and a reset switch.<br><br>
+Microcontroller single-boards are ideal for prototyping Internet of Things devices that principally involve connecting electronic circuits that read in or produce data involving simple data types.  For example, the typical temperature sensor (e.g., the TMP-36) produces voltage signals that are read in as floating point numbers.  A microcontroller single-board is ideal to combine with a temperature sensor to produce an Internet of Things thermometer.  <a href="#figure2">Figure 2</a> presents one such example using an Arduino MKR 1000.
+</p>
+        <img src="Picture2.png" id="figure2" width="800px" alt="Figure 2">
+        <p style="text-align:center">Figure 2: Prototype IOT Thermometers</p>
+        <p>Example microcontroller boards today include:</p>
+        <ul>
+            <li><span style="font-style:Italic">The Arduino Nano RP 2040 Connect.</span>  This replaced the MKR 1000 which is no longer sold.</li>
+            <li><span style="font-style:Italic">Other Arduino boards.</span>  Most boards can be WiFi enabled with a WiFi shield.  Arduino sells other WiFi enabled boards like the Nano 33 IoT.</li>
+            <li><span style="font-style:italic">Boards by Particle.  </span>The Particle Photon 2 is the Particle competitor to the Arduino WiFi boards.</li>
+            <li><span style="font-style:italic">Raspberry Pi Pico.  </span>This is a competitor product by Raspberry Pi.  The Pico does not come with prebuilt IoT capability, but this can be added by (for example) soldering on an ESP 32.</li>
+            <li><span style="font-style:italic">Texas Instruments MSP 430 series.  </span>The MSP 432U is the Texas Instruments WiFi competitor.</li>
+        </ul>
+            <h2 id="single">Single-Board Computers</h2>
+            <p>Single-board computers are computers.  They have operating systems, and can use device drivers to connect to peripherals like cameras, projectors, speakers, television sets, etc.  Single-board computers normally come with GPIO pins to connect to simple components, but also have connectors that allow them to interface with more complex components.<br/><br/>
+To illustrate, <a href="#figure3">Figure 3</a> presents an example Single-Board Computer, the Raspberry Pi 3 Model B+. As the picture demonstrates, the Pi has a set of (male-only) GPIO pins.  However, it also has HDMI, audio, ethernet and USB interfaces.
+</p>
+
+        <table id="figure3">
+            
+            <tr>
+                <td style="padding-right: 20px;"><img src="Picture3.png" width="350px" alt="Figure 3" ></td>
+                <td style="padding-right: 20px;"><img src="Picture4.png" width="350px" alt="Figure 4" ></td>
+            </tr>
+            
+            <tr>
+                <td style="text-align:center">(a) GPIO pins</td>
+                <td style="text-align:center">(b) Connectors to other components</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center">Figure 3: Pi 3 Model B+</td>
+            </tr>
+        </table>
+        <p>While one can use single-board computers to build simple IoT devices, it is more difficult to use these than single-board microcontrollers.  This is because there is substantial overhead required to get a single-board computer to simply start.  As a computer, the single-board computer needs an operating system, typically a Linux variant.  One would then have to install a programming language and other software on the computer.  The power on self-test for single-board computers is noticeably longer than that of sngle-board microcontrollers. <br/><br/>
+However, if one wants to create an IoT device that inputs or outputs complex data, a single-board computer is much easier to use than a single-board microcontroller.  That single-board computers use operating systems means there are device drivers available to manage the interaction with components like cameras, projectors, televisions, speakers, etc.  Furthermore, because Linux is often the default operating system for most of these computers, a large library of public, open-source code exists to help manage programming.  Also, code written relying on a particular operating system on one type of single-board computer can often be installed on any other single-board computer using that operating system with minimal difficulties.  This is because such code is often written at a relatively high-level of abstraction that relies on device drivers to do the actual machine-level interactions.  In contrast, because code for microcontrollers is often closer to the hardware, code written for one type of microcontroller often does not work with another- even if the two types of microcontrollers are from the same manufacturer. <br/><br/> 
+It is common to have both single-board computers and microcontrollers working together in Internet of Things systems.  The microcontrollers are used to interface with simple components (e.g., simple sensors), the single-board computers are used to interface with complex components like cameras, and the whole is managed by one or more single-board computers.<br/><br/>
+Example single-board computers include:
+</p>
+        <ul>
+            <li><span style="font-style:Italic">The Raspberry Pi</span> model 3 and 4.</li>
+            <li><span style="font-style:Italic">The Nvidia Jetson series</span> marketed as being good for machine-learning applications</li>
+            <li><span style="font-style:Italic">ODROID</span>, which are principally designed to mount Android OS.  Most single-board computers support variants of Linux.</li>
+            <li><span style="font-style:Italic">ASUS Tinker Board.</span>  A competitor to the Raspberry Pi that employs different connectors.</li>
+            <li><span style="font-style:Italic">Texas Instruments’ BeagleBoard</span> series.</li>
+        </ul>
+        
+        </div>
+
+
+        <div class="rightbar">
+            <p>IOT Boards.</p>
+            <ul>
+                <li>Microprocessor Single-boards</li>
+                <ul>
+                    <li><a href="https://www.arduino.cc/">Arduino Boards</a></li>
+                    <li><a href="https://store.particle.io/">Particle Boards</a></li>
+                    <li><a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a></li>
+                    <li><a href="https://www.ti.com/tool/MSP-EXP432E401Y">Texas Instruments MSP 432 series</a></li>
+                </ul>
+                <li>Single-Board Computers</li>
+                <ul>
+                    <li><a href="https://www.raspberrypi.com/">Raspberry Pi</a></li>
+                    <li><a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/">NVidia Jetson</a></li>
+                    <li><a href="https://www.hardkernel.com/">ODROID</a></li>
+                    <li><a href="https://www.asus.com/us/networking-iot-servers/aiot-industrial-solutions/all-series/tinker-board/">ASUS Tinkerboard</a></li>
+                    <li><a href="https://www.beagleboard.org/">Texas Instruments BeagleBoard</a></li>
+                </ul>
+            </ul>
+
+        </div>
+        </div>
+    </body>
+</html>
