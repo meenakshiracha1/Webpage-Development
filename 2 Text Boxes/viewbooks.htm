@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <style>
+            .leftcol{
+                display: inline-block;
+                font-weight: bold;
+                width: 80px;
+                text-align: right;
+            }
+            .rightcol{
+                display: inline-block;
+            }
+        </style>
+        <script>
+            function displayBooks(thetitle,thesort){
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function(){
+                    var bookarray = JSON.parse(this.responseText);
+                    var x=0;
+                    var rowobj=null;
+                    var cellobj=null;
+                    var theisbn="";
+                    changehere.innerHTML="";
+
+                    for(x=0;x<bookarray.length;x++){
+                        if(bookarray[x].isbn==theisbn){
+                            document.getElementById("author"+theisbn).innerHTML+="<br />"+bookarray[x].author_first+" "+bookarray[x].author_last; 
+                        }
+                        else{
+                            theisbn=bookarray[x].isbn;
+                            rowobj=document.createElement("tr");
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.innerHTML=bookarray[x].isbn;
+                            rowobj.appendChild(cellobj);
+
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.innerHTML=bookarray[x].title;
+                            rowobj.appendChild(cellobj);
+
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.id="author"+theisbn;
+                            cellobj.innerHTML=bookarray[x].author_first+" "+bookarray[x].author_last;
+                            rowobj.appendChild(cellobj);
+
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.innerHTML=bookarray[x].category_name;
+                            rowobj.appendChild(cellobj);
+
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.innerHTML=bookarray[x].listprice;
+                            rowobj.appendChild(cellobj);
+
+                            cellobj=document.createElement("td");
+                            cellobj.style="vertical-align: top";
+                            cellobj.innerHTML=bookarray[x].discount;
+                            rowobj.appendChild(cellobj);
+
+                            changehere.appendChild(rowobj)
+
+                        }
+                    }
+                }
+                if(thetitle.length==0)
+                    xhttp.open("GET","books.php?sort="+thesort, true);
+                else
+                    xhttp.open("GET", "books.php?title="+thetitle+"&sort="+thesort, true);
+                    xhttp.send();
+            }
+        </script>
+    </head>
+    <body onload="displayBooks('','title')">
+        <form>
+            <div class="leftcol">
+            <label for="sortby">Sort By:</label></div>
+            <div class="rightcol">
+            <select id="sortby" onchange="displayBooks(filterby.value,sortby.value);">
+                <option value="isbn">ISBN</option>
+                <option vaue="title" selected>Title</option>
+                <option value="category_name">Category Name</option>
+                <option value="listprice">List Price</option>
+                <option value="discount">Discount</option>
+            </select></div>
+            <br/>
+
+            <div class="leftcol">
+            <label for="filterby">Filter By:</label></div>
+            <div class="rightcol">
+            <input type="text" id="filterby" onkeyup="displayBooks(filterby.value,sortby.value);" /></div>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>ISBN</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category Name</th>
+                        <th>List Price</th>
+                        <th>Discount</th>
+                    </tr>
+                </thead>
+                <tbody id="changehere">
+                
+                </tbody>
+            </table>
+        </form>
+        
+
+    </body>
+</html>

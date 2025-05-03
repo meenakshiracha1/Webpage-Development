@@ -1,0 +1,85 @@
+<html>
+<head>
+    <script>
+        var antlist = [];
+        var motion;
+        var spawns;
+
+        function spawnant() {
+            var antimg = document.createElement("img");
+            antimg.src = "images/ant0.png";
+            antimg.style.left = Math.random() * 370 + "px";
+            antimg.style.top = "0px";
+            antimg.style.width = "30px";
+            antimg.style.position = "absolute";
+            antimg.className = "ant";
+
+            var ant = {
+                element: antimg,
+                frame: 0
+            };
+
+            document.getElementById("template").appendChild(antimg);
+            antlist.push(ant);
+        }
+
+        function moveants() {
+            for (var i = 0; i < antlist.length; i++) {
+                var ant = antlist[i];
+                var topcanva = parseInt(ant.element.style.top);
+
+                if (topcanva < 500) {
+                    ant.element.style.top = (topcanva + 5) + "px";
+                    antanimation(ant);
+                }
+            }
+        }
+
+        function antanimation(ant) {
+            ant.frame = (ant.frame + 1) % 4;
+            ant.element.src = "images/ant" + ant.frame + ".png";
+        }
+
+        function antgame() {
+            spawns = setInterval(spawnant, 1000);
+            motion = setInterval(moveants, 70);
+        }
+
+        window.onload = function () {
+            antgame();
+        };
+    </script>
+
+    <style>
+        #template {
+            width: 400px;
+            height: 500px;
+            position: relative;
+            border: 1px solid black;
+            overflow: hidden;
+        }
+
+        .table {
+            position: absolute;
+            bottom: 0;
+            width: 100px;
+        }
+
+        #rightimg {
+            right: 50px;
+        }
+
+        #leftimg {
+            left: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="template">
+        <img id="leftimg" class="table" src="images/picnictable.png">
+        <img id="rightimg" class="table" src="images/picnictable.png">
+    </div>
+    <p id="antskilled">Ants Killed: 0</p>
+</body>
+</html>

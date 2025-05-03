@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function setupGame(numAnts, difficultyIncrement) {
+            // Initialize game variables
+            score = 0;
+            difficulty = difficultyIncrement || 1;
+            ants = [];
+            document.getElementById("score").innerHTML = "Ants Killed: " + score;
+
+            // Clear previous game elements
+            document.getElementById("gameCanvas").innerHTML = `
+                <div id="gameOver">Game Over</div>
+                <img id="picnicTableLeft" class="picnicTable" src="images/picnictable.png" alt="Picnic Table Left">
+                <img id="picnicTableRight" class="picnicTable" src="images/picnictable.png" alt="Picnic Table Right">
+            `;
+
+            // Setup intervals for game logic
+            gameInterval = setInterval(moveAnts, 70);
+            spawnInterval = setInterval(spawnAnt, 1000 / difficulty);
+            difficultyInterval = setInterval(increaseDifficulty, 1000);
+
+            // Spawn initial ants
+            for (let i = 0; i < numAnts; i++) {
+                spawnAnt();
+            }
+        }
+
+        function spawnAnt() {
+            let antId = "ant" + ants.length;
+            let antElement = document.createElement("img");
+            antElement.src = "images/ant0.png";
+            antElement.style.position = "absolute";
+            antElement.style.width = "30px";
+            antElement.style.left = Math.random() * 370 + "px";
+            antElement.style.top = "0px";
+            antElement.id = antId;
+
+            // Store ant details
+            document.getElementById("gameCanvas").appendChild(antElement);
+            ants.push({ id: antId, frame: 0, crushed: false, x: parseInt(antElement.style.left), y: parseInt(antElement.style.top) });
+
+            // Attach event listener
+            antElement.onmousedown = function (event) {
+                crushAnt(antId);
+            };
+        }
+
+        function moveAnts() {
+            ants.forEach(function (ant) {
+                if (ant.crushed) return;
+                let antElement = document.getElementById(ant.id);
+                ant.y += 5;
+                antElement.style.top = ant.y + "px";
+
+                // Check if ant reached the picnic table
+                if (ant.y >= 400) {
+                    playSound("images/eating.mp3");
+                    endGame();
+                } else {
+                    animateAnt(ant);
+                }
+            });
+        }
+
+        function animateAnt(ant) {
+            let antElement = document.getElementById(ant.id);
+            ant.frame = (ant.frame + 1) % 4;
+            antElement.src = "images/ant" + ant.frame + ".png";
+        }
+
+        function crushAnt(antId) {
+            let ant = ants.find((a) => a.id === antId);
+            if (!ant || ant.crushed) return;
+
+            let antElement = document.getElementById(ant.id);
+            ant.crushed = true;
+            antElement.src = "images/deadant.png";
+            antElement.onmousedown = null; // Disable further clicks
+            playSound("images/squish.mp3");
+            score++;
+            document.getElementById("score").innerHTML = "Ants Killed: " + score;
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            clearInterval(difficultyInterval);
+
+            let gameOver = document.getElementById("gameOver");
+            gameOver.style.display = "block";
+            growGameOverSign();
+        }
+
+        function growGameOverSign() {
+            let gameOver = document.getElementById("gameOver");
+            let size = parseInt(gameOver.style.fontSize) || 14;
+            let id = setInterval(function () {
+                if (size < 44) {
+                    size++;
+                    gameOver.style.fontSize = size + "px";
+                } else {
+                    clearInterval(id);
+                }
+            }, 20);
+        }
+
+        function increaseDifficulty() {
+            difficulty++;
+            clearInterval(spawnInterval);
+            spawnInterval = setInterval(spawnAnt, 1000 / difficulty);
+        }
+
+        function playSound(src) {
+            let audio = new Audio(src);
+            audio.play();
+        }
+
+        window.onload = function () {
+            setupGame(5, 1);
+        };
+    </script>
+    <style>
+        #gameCanvas {
+            width: 400px;
+            height: 500px;
+            position: relative;
+            border: 1px solid black;
+            overflow: hidden;
+        }
+        .ant {
+            z-index: 10;
+        }
+        #gameOver {
+            position: absolute;
+            top: 200px;
+            left: 100px;
+            font-size: 14px;
+            color: red;
+            display: none;
+        }
+        .picnicTable {
+            position: absolute;
+            bottom: 0;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameCanvas"></div>
+    <p id="score">Ants Killed: 0</p>
+</body>
+</html>

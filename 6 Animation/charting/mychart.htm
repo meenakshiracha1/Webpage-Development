@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <link href="cssex.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      function controlboxes(whichchart)
+      {
+          if (whichchart=='p')
+            var ispie=true;
+          for (x=0; x<6; x++){
+              document.getElementById("param"+x).disabled=ispie;
+              if (x % 2==0)
+                document.getElementById("value"+x).disabled=!ispie;
+          }
+      }
+    </script>
+    <title>Main Page</title>
+  </head>
+  <body>
+      <form>
+          <div style="display: inline-block; vertical-align: top;">
+              <input type="radio" 
+                     name="whichchart"
+                     id="barchart"
+                     value="b"
+                     onclick="controlboxes('b')"
+              /><label for="barchart">Bar Chart</label>
+              <input type="radio" 
+                     name="whichchart" 
+                     id="linechart"
+                     value="l" 
+                     onclick="controlboxes('l')"
+              /><label for="linechart">Line Chart</label><br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param0" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param0">Include drinks for store 1</label>
+                           Color picker here
+                           <br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param1" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param1">Include drinks for store 2</label>
+                           Color picker here
+                           <br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param2" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param2">Include food for store 1</label>
+                           Color picker here
+                           <br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param3" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param3">Include food for store 2</label>
+                           Color picker here
+                           <br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param4" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param4">Include complaints for store 1</label>
+                           Color picker here
+                           <br />
+              &nbsp;&nbsp;<input type="checkbox" 
+                                 id="param5" 
+                                 value="Y" 
+                                 disabled
+                           /><label for="param5">Include complaints for store 2</label>
+                           Color picker here
+                           <br />
+          </div>
+          <div style="display: inline-block; vertical-align: top;">
+              <input type="radio" 
+                     name="whichchart" 
+                     id="piechart"
+                     value="p" 
+                     onclick="controlboxes('p');"
+               /><label for="piechart">Pie Chart</label><br />
+               &nbsp;&nbsp;<input type="radio" 
+                                  name="whichpie" 
+                                  id="value0"
+                                  value="1" 
+                                  disabled
+                           /><label for="value0">Store 1 vs Store 2 Drink Sales</label> 
+                           <br /> 
+               &nbsp;&nbsp;<input type="radio" 
+                                  name="whichpie" 
+                                  id="value2"
+                                  value="2" 
+                                  disabled
+                           /><label for="value2">Store 1 vs Store 2 Food Sales</label>
+                           <br /> 
+               &nbsp;&nbsp;<input type="radio" 
+                                  name="whichpie" 
+                                  id="value4"
+                                  value="3" 
+                                  disabled
+                           /><label for="value4">Store 1 vs Store 2 Complaints</label>
+                           <br /> 
+                Colors: 
+				<input type="color"
+					   id="piepick0"
+					   value="#00FFFF"
+                                           disabled
+				/><label for="piepick0">Store 1</label>
+				<input type="color"
+					   id="piepick1"
+					   value="#FF00FF"
+                                           disabled
+				/><label for="piepick1">Store 2</label>
+
+          </div><br />
+       </form>
+  </body>
+</html>

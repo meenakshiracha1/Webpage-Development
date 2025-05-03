@@ -1,0 +1,141 @@
+<html>
+<head>
+    <style>
+        .leftcol {
+            display: inline-block;
+            text-align: right;
+            vertical-align: top;
+            font-weight: bold;
+        }
+        .middlecol {
+            display: inline-block;
+            text-align: right;
+        }
+        #txtarea {
+            margin-top: 20px;
+            font-weight: bold;
+            color: blue;
+        }
+    </style>
+
+    <script>
+        function searcharea(radiois){
+            var nametxt;
+            var regionpdown;
+            nametxt=document.getElementById('nametxt');
+            regionpdown=document.getElementById('regionpdown');
+            if(radiois === 'name') 
+            {
+                nametxt.disabled=false;  
+                regionpdown.disabled=true; 
+            } 
+            else if(radiois === 'region') 
+            {
+                nametxt.disabled=true;   
+                regionpdown.disabled=false; 
+            }
+        }
+
+        function namesec(){
+            var nametxt;
+            nametxt=document.getElementById('nametxt').value;
+            var xhttp=new XMLHttpRequest();
+            xhttp.onload = function() {
+                var data=JSON.parse(this.responseText);
+                if(data.region) {
+                    regionpdown.value = data.region; 
+                }
+                tablesecresult(data);
+            }
+            xhttp.open("GET", "b.php?byName=" + nametxt + "&sort=statename", true);
+            xhttp.send();
+        }
+
+        function regionsec(){
+            var regionlist=document.getElementById('regionpdown');
+            var xhttp=new XMLHttpRequest();
+            xhttp.onload = function() {
+                var regions=JSON.parse(this.responseText);
+                regionlist.innerHTML = '<option value="All">All</option>';
+                for(var i=0; i<regions.length; i++) {
+                    var option=document.createElement('option');
+                    option.value=regions[i].region;
+                    option.text=regions[i].region;
+                    regionlist.appendChild(option);
+                }
+                regionpulldown();
+            }
+            xhttp.open("GET", "b.php?regions=true", true);
+            xhttp.send();
+        }
+
+        
+        function regionpulldown(){
+            var byRegion;
+            byRegion=document.getElementById('regionpdown').value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                var data=JSON.parse(this.responseText);
+                tablesecresult(data);
+            }
+            xhttp.open("GET", "b.php?byRegion=" + byRegion + "&sort=statename", true);
+            xhttp.send();
+        }
+
+        function tablesecresult(tabledata){
+            var tableSec;
+            var tablebody;
+            tableSec=document.getElementById('tablesec');
+            tablebody=document.getElementById('changehere');
+            tablebody.innerHTML= ''; 
+            if(tabledata.length === 0) 
+            {
+                document.getElementById('txtarea').textContent = 'No results found.';
+                tableSec.style.display = 'none';
+                return;
+            }
+            for(var i=0; i<tabledata.length; i++) 
+            {
+                var row=document.createElement('tr');
+                row.innerHTML= '<td>' + tabledata[i].statename + '</td><td>' + tabledata[i].pci + '</td><td>' + tabledata[i].pop + '</td>';
+                tablebody.appendChild(row);
+            }
+            document.getElementById('txtarea').textContent= '';
+            tableSec.style.display= 'table'; 
+        }
+    </script>
+</head>
+<body onload="regionsec()">
+    <form>
+        <div class="leftcol">
+            <input type="radio" id="byNameRadio" name="radio1" checked onclick="searcharea('name')">
+            <label for="byNameRadio">By Name:</label>
+        </div>
+        <div class="middlecol" style="width: 250px;">
+            <input type="text" id="nametxt" oninput="namesec()" placeholder="Enter state name here">
+        </div>
+        <br>
+
+        <div class="leftcol">
+            <input type="radio" id="byRegionRadio" name="radio1" onclick="searcharea('region')">
+            <label for="byRegionRadio">By Region:</label>
+        </div>
+        <div class="middlecol" style="width: 190px;">
+            <select id="regionpdown" disabled onchange="regionpulldown()"></select>
+        </div>
+        <hr>
+        <table border="1" id="tablesec" style="display:none;">
+            <thead>
+                <tr>
+                    <th>State Name</th>
+                    <th>Per Capita Income</th>
+                    <th>Population</th>
+                </tr>
+            </thead>
+            <tbody id="changehere"></tbody>
+        </table>
+
+        <div id="txtarea"></div>
+    </form>
+</body>
+</html>

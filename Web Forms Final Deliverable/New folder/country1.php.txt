@@ -1,0 +1,20 @@
+<?php
+$title = isset($_REQUEST['title']) ? strtoupper($_REQUEST['title']) : '';
+if (strlen($title)==0){
+$title='%';
+$mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+$stmt=$mydb->prepare("SELECT countryname, population, landarea FROM countries ORDER BY countryname "
+                    );
+}
+else{
+$title='%'. $title .'%';
+$mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+$stmt=$mydb->prepare("SELECT countryname, population, landarea FROM countries WHERE ".
+                     "countryname LIKE '$title' ".
+                     "ORDER BY countryname "
+                    );
+}
+$stmt->execute();
+$result=$stmt->fetchAll();
+echo json_encode($result);
+?>

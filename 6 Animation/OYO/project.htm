@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #107896;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #107896;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            display: inline-flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+        }
+        nav a:hover {
+            background-color: yellow;
+            color: blue;
+        }
+        section {
+            display: none;
+            padding: 20px;
+        }
+        section.active {
+            display: block;
+        }
+
+        /* Styles for Edit State */
+        
+        #searchfield {
+            position: relative;
+            top: 40px; 
+        }
+        #dataentry {
+            position: relative;
+            top: 30px; 
+        }
+        h1 {
+            font-family: Trebuchet ms, Verdana, Myriad Web, Syntax, sans-serif;
+            color: white;
+            margin-bottom: 5px;
+            background-color: none;  
+            margin-left: 450px; 
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: none;  
+            border-radius: 8px;
+        }
+        .formfield {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 5px;
+        }
+        .leftcol {
+            width: 180px;
+            text-align: right;
+            padding-right: 15px;
+            font-weight: bold;
+        }
+        .buttonsec {
+            display: flex;
+            justify-content: space-between; 
+            margin-right: 80px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #444;
+            color: white;
+            border: none;
+        }
+        .buttonsec button:disabled {
+            opacity: 0.5;
+        }
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .rightcol {
+            color: red;
+            text-align: left;
+            margin-left: 10px; 
+        }
+
+        /* Styles for Generate Chart Tab */
+        .leftbar {
+            border: 2px solid #fff;
+            width: 400px;
+            padding: 10px;
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            background-color: #107896;
+            color: white;
+        }
+
+        #generatechart {
+            background-color: #107896;
+            padding: 20px;
+            margin-left: 450px;
+        }
+
+        .chartleftcol {
+            display: inline-block;
+            text-align: right;
+            width: 120px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .chartmiddlecol {
+            display: inline-block;
+            text-align: left;
+            width: 150px;
+        }
+
+        h2 {
+            font-family: Trebuchet ms, Verdana, sans-serif;
+            color: white;
+            margin-bottom: 15px;
+            text-align: center; 
+        }
+
+
+        input, select {
+            width: 100%;
+            padding: 5px;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input[type="radio"] {
+            width: auto;
+        }
+
+        canvas {
+            background-color: #107896; 
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Page Navigation
+        function tabs(pageId) {
+            var sections = document.getElementsByTagName('section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.remove('active');
+            }
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function savebuttonfctn() {
+            var foodandbev= document.getElementById('foodandbev').value;
+            var gasandenergy= document.getElementById('gasandenergy').value;
+            var healthcare= document.getElementById('healthcare').value;
+            var housing= document.getElementById('housing').value;
+            var other= document.getElementById('other').value;
+            var errormsgs= false;
+
+            if(foodandbev<0 || foodandbev === "") {
+                document.getElementById('foodandbeverrormsg').innerHTML= "Must have a Food and Beverage greater than or equal to 0!";
+                errormsgs = true;
+            }else{
+                document.getElementById('foodandbeverrormsg').innerHTML= "";
+            }
+
+            if(gasandenergy<0 || gasandenergy === "") {
+                document.getElementById('gasandenergyerrormsg').innerHTML= "Must have a Gas and Energy greater than or equal to 0!";
+                errormsgs = true;
+            } else {
+                document.getElementById('gasandenergyerrormsg').innerHTML= "";
+            }
+
+            if(healthcare<0 || healthcare === "") {
+                document.getElementById('healthcareerrormsg').innerHTML= "Must have a Healthcare greater than or equal to 0!";
+                errormsgs = true;
+            } else {
+                document.getElementById('healthcareerrormsg').innerHTML= "";
+            }
+
+            if(housing<0 || housing === "") {
+                document.getElementById('housingerrormsg').innerHTML= "Must have a Housing greater than or equal to 0!";
+                errormsgs = true;
+            } else {
+                document.getElementById('housingerrormsg').innerHTML= "";
+            }
+
+            if(other<0 || other === "") {
+                document.getElementById('othererrormsg').innerHTML= "Must have a Other greater than or equal to 0!";
+                errormsgs = true;
+            } else {
+                document.getElementById('othererrormsg').innerHTML= "";
+            }
+
+            var saveButton = document.getElementById('saveButton');
+                if(errormsgs) {
+                    saveButton.disabled = true;
+                }else {
+                    saveButton.disabled = false;
+                }
+            }
+
+
+        function byabbreviationfuctn() {
+            var stateabbrev=document.getElementById("stateabbrev").value;
+            if(stateabbrev.length > 0) {
+                var xhttp=new XMLHttpRequest();
+                xhttp.onload = function() {
+                    var data = JSON.parse(this.responseText);
+                        
+                    if(data){
+                        if(data.success){
+                            document.getElementById('abbrev').innerHTML = stateabbrev.toUpperCase();
+                            document.getElementById('state').innerHTML = data.state;
+                            document.getElementById('foodandbev').value = data.foodandbev;
+                            document.getElementById('gasandenergy').value = data.gasandenergy;
+                            document.getElementById('healthcare').value = data.healthcare;
+                            document.getElementById('housing').value = data.housing;
+                            document.getElementById('other').value = data.other;
+                            document.getElementById('abbreverrormsg').innerHTML = ""; 
+                            enabledisable('dataentry');
+                        } else {
+                            document.getElementById('abbreverrormsg').innerHTML = "No matching state!";
+                        }
+                    }
+                };
+                xhttp.open("GET", "search_state.php?abbreviation=" + stateabbrev, true);
+                xhttp.send();
+            }
+        }
+
+        function bystatenamefunct() {
+        var statename = document.getElementById("statename").value;
+        if (statename.trim().length > 0) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+            if (this.status === 200) {
+                var data = JSON.parse(this.responseText);
+                if (data && data.success) {
+                    document.getElementById("abbrev").innerHTML = data.abbreviation ? data.abbreviation.toUpperCase() : "";
+                    document.getElementById("state").innerHTML = data.state || "";
+                    document.getElementById("foodandbev").value = data.foodandbev || "";
+                    document.getElementById("gasandenergy").value = data.gasandenergy || "";
+                    document.getElementById("healthcare").value = data.healthcare || "";
+                    document.getElementById("housing").value = data.housing || "";
+                    document.getElementById("other").value = data.other || "";
+                    document.getElementById("abbreverrormsg").innerHTML = "";
+
+                    enabledisable("dataentry");
+                } else {
+                    document.getElementById("abbreverrormsg").innerHTML = "No matching state found!";
+                    enabledisable("searchfield");
+                }
+            } else {
+                document.getElementById("abbreverrormsg").innerHTML = "Error fetching state data.";
+            }
+        };
+
+        xhttp.onerror = function () {
+            document.getElementById("abbreverrormsg").innerHTML = "Please try again.";
+        };
+
+        xhttp.open("GET", "search_state.php?statename=" + statename, true);
+        xhttp.send();
+    } else {
+        document.getElementById("abbreverrormsg").innerHTML = "Please enter a state name.";
+    }
+}
+    
+
+        function cancelfunct() {
+            if (confirm("Really want to cancel?")) {
+                document.getElementById('abbrev').innerHTML = '';
+                document.getElementById('state').innerHTML = '';
+                document.getElementById('foodandbev').value = '';
+                document.getElementById('gasandenergy').value = '';
+                document.getElementById('healthcare').value = '';
+                document.getElementById('housing').value = '';
+                document.getElementById('other').value = '';
+        
+                enabledisable('searchfield');
+            }
+        }
+
+        function enabledisable(enableform) {
+            var searcharea = document.getElementById('searchfield');
+            var dataentryarea = document.getElementById('dataentry');
+            if (enableform === 'dataentry') {
+                searcharea.classList.add('disabled');
+                dataentryarea.classList.remove('disabled');
+            } else {
+                dataentryarea.classList.add('disabled');
+                searcharea.classList.remove('disabled');
+            }
+        }
+
+        function statelistfunct() {
+            var xhttp = new XMLHttpRequest();
+                xhttp.onload = function() {
+                    var states = JSON.parse(this.responseText);
+                    var statedatalist = document.getElementById("stateList");
+                    statedatalist.innerHTML = "";  
+                for (var i = 0; i < states.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = states[i];
+                    statedatalist.appendChild(option);
+                }
+        };
+        xhttp.open("GET", "statesdata.php", true);
+        xhttp.send();
+        }
+
+        
+
+        function savebtn(event) {
+            event.preventDefault(); 
+            
+            var data = {
+                    abbreviation: document.getElementById("abbrev").textContent,
+                    state: document.getElementById("state").textContent,
+                    foodandbev: document.getElementById("foodandbev").value,
+                    gasandenergy: document.getElementById("gasandenergy").value,
+                    healthcare: document.getElementById("healthcare").value,
+                    housing: document.getElementById("housing").value,
+                    other: document.getElementById("other").value,
+            };
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+            var response = JSON.parse(this.responseText);
+            if (response.success) {
+                alert("Data saved successfully!");
+                document.getElementById('abbrev').textContent = '';
+                document.getElementById('state').textContent = '';
+                document.getElementById('foodandbev').value = '';
+                document.getElementById('gasandenergy').value = '';
+                document.getElementById('healthcare').value = '';
+                document.getElementById('housing').value = '';
+                document.getElementById('other').value = '';
+                document.getElementById('saveButton').disabled = true;
+                tabs('searchfield');
+            } else {
+                alert("Error while saving data: " + response.error);
+            }
+        };
+
+            xhttp.open("POST", "save_state.php", true);
+            xhttp.send(JSON.stringify(data)); 
+        }
+
+        
+        window.onload = function () {
+            statelistfunct();
+            tabs('editstate');
+            droppdowns();
+        };
+
+
+
+<!-- Chart -->
+
+        var thechart = null;
+
+        function droppdowns() {
+            regionsec();
+            expensesec();
+        }
+
+       
+        function regionsec() {
+            var regionlist = document.getElementById('regionpdown');
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                var regions = JSON.parse(this.responseText);
+                regionlist.innerHTML = '<option value="All">All</option>';
+                regions.forEach(function (region) {
+                    if (region.region.trim() !== "") {
+                        var option = document.createElement('option');
+                        option.value = region.region;
+                        option.textContent = region.region;
+                        regionlist.appendChild(option);
+                    }
+                });
+            };
+            xhttp.open("GET", "region.php?regions=true", true);
+            xhttp.send();
+        }
+
+        
+        function expensesec() {
+            var expenseslist = document.getElementById('expensesdown');
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                var expenses = JSON.parse(this.responseText);
+                expenseslist.innerHTML = '';
+                expenses.forEach(function (expense) {
+                    var option = document.createElement('option');
+                    option.value = expense.expensecode;
+                    option.textContent = expense.expensename;
+                    if (expense.expensename === "Food and Beverage") {
+                        option.selected = true;
+                    }
+                    expenseslist.appendChild(option);
+                });
+            };
+            xhttp.open("GET", "expenses.php?type=expenses", true);
+            xhttp.send();
+        }
+
+        var piecolors = [
+    '#0048BA','#B0BF1A','#7CB9E8','#B284BE','#72A0C1','#F0F8FF','#DB2D43','#C46210','#EFDECD','#9F2B68','#F19CBB','#AB274F','#3B7A57','#FFBF00','#9966CC','#3DDC84','#CD9575','#665D1E','#915C83','#841B2D','#FAEBD7','#FBCEB1','#00FFFF','#7FFFD4','#D0FF14','#4B6F44','#E9D66B','#B2BEB5','#FF9966','#FDEE00','#007FFF','#F0FFFF','#89CFF0','#A1CAF1','#F4C2C2','#FEFEFA','#FF91AF','#FAE7B5','#DA1884','#7C0A02','#848482','#BCD4E6','#9F8170','#F5F5DC','#2E5894','#9C2542','#FFE4C4','#3D2B1F','#967117','#CAE00D','#000000','#3D0C02','#54626F','#3B3C36','#BFAFB2','#FFEBCD','#A57164','#318CE7','#ACE5EE','#660000','#0000FF','#1F75FE','#0093AF','#0087BD','#0018A8','#333399','#A2A2D0','#6699CC','#5DADEC','#126180','#8A2BE2','#5072A7','#3C69E7','#DE5D83','#79443B','#E3DAC9','#CB4154','#D891EF','#FFAA1D','#CD7F32','#AF6E4D','#7BB661','#FFC680','#800020','#DEB887','#A17A74','#CC5500','#E97451','#8A3324','#BD33A4','#702963','#5F9EA0','#91A3B0','#006B3C','#ED872D','#A67B5B','#4B3621','#A3C1AD','#C19A6B','#EFBBCC','#FFFF99','#FFEF00','#E4717A','#C41E3A','#00CC99','#960018','#D70040','#FFA6C9','#B31B1B','#56A0D3','#ED9121','#703642','#C95A49','#ACE1AF','#B2FFFF','#DE3163','#007BA7','#2A52BE','#6D9BC3','#1DACD6','#F7E7CE','#F1DDCF','#36454F','#E68FAC','#80FF00','#FFB7C5','#954535','#E23D28','#DE6FA1','#AA381E','#856088','#FFB200','#7B3F00','#D2691E','#98817B','#E34234','#CD607E','#E4D00A','#9FA91F','#7F1734','#6F4E37','#B9D9EB','#F88379','#8C92AC','#B87333','#DA8A67','#AD6F69','#CB6D51','#996666','#FF3800','#FF7F50','#F88379','#893F45','#FBEC5D','#6495ED','#FFF8DC','#2E2D88','#FFF8E7','#81613C','#FFBCD9','#FFFDD0','#DC143C','#9E1B32','#F5F5F5','#00FFFF','#00B7EB','#58427C','#FFD300','#F56FA1','#654321','#5D3954','#008B8B','#536878','#B8860B','#006400','#1A2421','#BDB76B','#483C32','#543D37','#8B008B','#556B2F','#FF8C00','#9932CC','#301934','#8B0000','#E9967A','#8FBC8F','#3C1414','#8CBED6','#483D8B','#2F4F4F','#177245','#00CED1','#9400D3','#555555','#DA3287','#FAD6A5','#B94E48','#004B49','#FF1493','#FF9933','#00BFFF','#4A646C','#7E5E60','#1560BD','#2243B6','#C19A6B','#EDC9AF','#696969','#1E90FF','#4A412A','#00009C','#EFDFBB','#555D50','#C2B280','#1B1B1B','#614051','#F0EAD6','#CCFF00','#BF00FF','#8F00FF','#50C878','#6C3082','#B48395','#AB4B52','#CC474B','#563C5C','#00FF40','#96C8A2','#C19A6B','#801818','#B53389','#DE5285','#E5AA70','#4F7942','#6C541E','#FF5470','#683068','#B22222','#CE2029','#E25822','#EEDC82','#A2006D','#FFFAF0','#228B22','#A67B5B','#856D4D','#0072BB','#FD3F92','#86608E','#9EFD38','#D473D4','#FD6C9E','#C72C48','#77B5FE','#8806CE','#E936A7','#FF00FF','#C154C1','#E48400','#87421F'
+];
+
+        
+        function chartsoutput(whichchart) {
+        var charts = document.getElementById('chart');
+        if (thechart) thechart.destroy();
+
+        var regionchoice = document.getElementById('regionpdown').value;
+        var expensechoice = document.getElementById('expensesdown').value;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+            var response = JSON.parse(this.responseText);
+            var labels = response.states;
+            var data = response.expenses;
+
+            if (whichchart === 'bar') {
+                thechart = new Chart(charts, {
+                    type: 'bar',
+                    data: {
+                        datasets: [
+                            {
+                                data: data,
+                                backgroundColor: "#FF0000"
+                            }
+                        ] 
+                    }, 
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                color: 'white'
+                            }
+                        },
+                        scales: { 
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'States', 
+                                    color: 'white'
+                                },
+                                grid: { color: 'white' },
+                                ticks: { color: 'white', autoSkip: false },
+                                type: 'category',
+                                labels: labels, 
+                            }, 
+                            y: {
+                                title: {
+                                    text: 'Expenses',
+                                    display: true,
+                                    color: 'white'
+                                },
+                                grid: { color: 'white' },
+                                ticks: { color: 'white' },
+                                type: 'linear'
+                            } 
+                        } 
+                    } 
+                });
+            } else if (whichchart === 'pie') {
+                thechart = new Chart(charts, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {  
+                                data: data,
+                                backgroundColor: piecolors.slice(0, labels.length)
+                            }  
+                        ]  
+                    },  
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Expenses',
+                                color: 'white'
+                            },
+                            legend: {
+                                labels: {
+                                    color: 'white'
+                                }
+                            }
+                        }
+                    }  
+                });
+            }
+        };
+        xhttp.open("GET", `fetchData.php?region=${regionchoice}&expense=${expensechoice}`, true);
+        xhttp.send();
+    }
+
+        function controlboxes(whichchart) {
+            chartsoutput(whichchart);
+        }
+    </script>
+</head>
+
+<body >
+    <header>
+        <nav>
+            <a href="javascript:void(0);" onclick="tabs('editstate')">Edit State</a>
+            <a href="javascript:void(0);" onclick="tabs('generatechart')">Generate Chart</a>
+        </nav>
+        <hr>
+    </header>
+    <main>
+        <!-- Edit State Tab -->
+        <section id="editstate" class="active">
+            <div id="searchfield">
+        <h1>Search</h1>
+        <form>
+            <div class="formfield">
+                <div class="leftcol">By Abbreviation:</div>
+                <div class="middlecol">
+                    <input type="text" id="stateabbrev" style="width: 50px;" oninput="byabbreviationfuctn()" />
+                </div>
+                <div class="rightcol" id="abbreverrormsg"></div>
+            </div>
+
+            <div class="formfield" id="stateNameContainer">
+                <div class="leftcol">By State Name:</div>
+                <div class="middlecol">
+                    <input type="text" id="statename" list="stateList"  oninput="bystatenamefunct()" />
+                    <datalist id="stateList"></datalist>
+                </div>
+            </div>
+        </form>
+    </div><br><br>
+<hr>
+    
+    <div id="dataentry" class="disabled">
+        <h1>Data Entry</h1>
+        <form onsubmit="savebtn(event)" >
+            <div class="formfield">
+                <div class="leftcol">Abbrev:</div>
+                <div class="middlecol"><span id="abbrev"></span></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">State:</div>
+                <div class="middlecol"><span id="state"></span></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="foodandbev">Food and Beverage:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="foodandbev" name="foodandbev" oninput="savebuttonfctn()" min="0" required/> 
+                </div>
+                <div class="rightcol" id="foodandbeverrormsg"></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="gasandenergy">Gas and Energy:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="gasandenergy" name="gasandenergy"  oninput="savebuttonfctn()" min="0" required/>
+                </div>
+                <div class="rightcol" id="gasandenergyerrormsg"></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="healthcare">Healthcare:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="healthcare" name="healthcare"  oninput="savebuttonfctn()" min="0" required/>
+                </div>
+                <div class="rightcol" id="healthcareerrormsg"></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="housing">Housing and Utilities:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="housing" name="housing"  oninput="savebuttonfctn()" min="0" required/>
+                </div>
+                <div class="rightcol" id="housingerrormsg"></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="other">Other:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="other" name="other"  oninput="savebuttonfctn()" min="0" required/>
+                </div>
+                <div class="rightcol" id="othererrormsg"></div>
+            </div>            
+
+            <div class="buttonsec">
+                <button type="button" onclick="cancelfunct()">Cancel</button>
+                <button type="submit" id="saveButton" disabled>Save</button>
+            </div>
+        </form>
+    </div>
+        </section>
+
+
+
+        <!-- Generate Chart Tab -->
+        <section id="generatechart">
+            <div class="leftbar">
+        <h2>Options</h2>
+
+        <div class="chartleftcol">
+            <label for="regionpdown">By Region:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <select id="regionpdown"></select>
+        </div><br>
+
+        <div class="chartleftcol">
+            <label for="expensesdown">Expense:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <select id="expensesdown"></select>
+        </div><br>
+
+        <div class="chartleftcol">
+            <label for="graphtype">Graph Type:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <input type="radio" id="barchart" name="chart" value="bar" onclick="controlboxes('bar')" checked>
+            <label for="barchart" >Bar Chart</label><br>
+            <input type="radio" id="piechart" name="chart" value="pie" onclick="controlboxes('pie')">
+            <label for="piechart">Pie Chart</label>
+        </div>
+    </div>
+        <h2>Chart</h2>
+        <canvas id="chart" width="1000" height="400" ></canvas>
+    </section>
+    </main>
+</body>
+</html>

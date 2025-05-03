@@ -1,0 +1,191 @@
+<html>
+<head>
+    <script>
+        var antlist=[];
+        var motion;
+        var spawns;
+        var gameovertime;
+        var clocktickstime;
+        var antdead=0;
+        var clockticks=1;
+        var textsize=14;
+        var gameOver=false; 
+
+        function spawnant() 
+        {
+            var antimg;
+
+            antimg=document.createElement("img");
+            antimg.src="images/ant0.png";
+            antimg.style.left=Math.random()*370+"px";
+            antimg.style.top="0px";
+            antimg.style.width="30px";
+            antimg.style.position="absolute";
+            antimg.className="ant";
+
+            var ant = 
+            { 
+                element: antimg, frame: 0, crushed: false 
+            };
+
+            antimg.onmousedown=function()
+            {
+                clickant(ant);
+            };
+
+            document.getElementById("template").appendChild(antimg);
+            antlist.push(ant);
+        }
+
+        function moveants() 
+        {
+            for(var i=0;i<antlist.length;i++) 
+            {
+                var ant=antlist[i];
+                if(ant.crushed) 
+                { 
+                    continue; 
+                }
+                var topcanva=parseInt(ant.element.style.top);
+                if(topcanva>=400) 
+                {
+                    new Audio("images/eating.mp3").play();
+                    endGame();
+                    break;
+                } else 
+                {
+                    ant.element.style.top=(topcanva+5)+"px";
+                    antanimation(ant);
+                }
+            }
+        }
+
+        function antgame() 
+        {
+            spawns=setInterval(spawnant,1000/clockticks);
+            motion=setInterval(moveants,70);
+            document.getElementById("antskilled").innerHTML="Ants Killed: " + antdead;
+            clocktickstime=setInterval(increaseclockticks,3000);
+        }
+
+        function antanimation(ant) 
+        {
+            if(ant.crushed) 
+            { 
+                return; 
+            }
+            ant.frame=(ant.frame+1)%4;
+            ant.element.src="images/ant"+ant.frame+".png";
+        }
+
+        function clickant(ant) 
+        {
+            if(gameOver || !ant || !ant.element || ant.crushed) 
+            {
+                return;
+            }
+            ant.crushed=true;
+            ant.element.src="images/deadant.png";
+            ant.element.onmousedown=null;
+            new Audio("images/squish.mp3").play();
+            antdead++;
+            document.getElementById("antskilled").innerHTML="Ants Killed: "+antdead;
+        }
+
+
+        function increasetextsize() 
+        {
+            var gameovertxt=document.getElementById("gameovertxt");
+            gameovertxt.style.display="block";
+            gameovertxt.style.fontSize=textsize+"px";
+            if(textsize<44) 
+            {
+                textsize++;
+            } else 
+            {
+                clearInterval(gameovertime);
+                anistop();
+            }
+        }
+
+        function anistop() 
+        {
+            for(var i=0;i<antlist.length;i++) 
+            {
+                var ant=antlist[i];
+                if(!ant.crushed) 
+                {
+                    ant.element.src="images/ant0.png";
+                }
+            }
+        }
+
+        function increaseclockticks() 
+        {
+            clockticks++;
+            clearInterval(spawns);
+            spawns=setInterval(spawnant,3000/clockticks);
+        }
+
+        function endGame() 
+        {
+            gameOver=true; 
+            clearInterval(motion);
+            clearInterval(spawns);
+            clearInterval(clocktickstime);
+            gameovertime=setInterval(increasetextsize,20);
+        }
+        
+        window.onload=function() 
+        {
+            antgame();
+        };
+    </script>
+    <style>
+        #template{
+            width:400px;
+            height:500px;
+            position:relative;
+            border:1px solid black;
+            overflow:hidden;
+        }
+
+        .table{
+            position:absolute;
+            bottom:0;
+            width:100px;
+        }
+
+        #rightimg{
+            right:50px;
+        }
+
+        #leftimg{
+            left:50px;
+        }
+
+        .ant{
+            z-index:10;
+        }
+
+        #gameovertxt{
+            position:absolute;
+            top:200px;
+            left:100px;
+            font-size:14px;
+            color:red;
+            display:none;
+            z-index:1000;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="template">
+        <div id="gameovertxt">Game Over</div>
+        <img id="leftimg" class="table" src="images/picnictable.png">
+        <img id="rightimg" class="table" src="images/picnictable.png">
+    </div>
+    <p id="antskilled">Ants Killed: 0</p>
+</body>
+</html>

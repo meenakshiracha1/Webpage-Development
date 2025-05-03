@@ -1,0 +1,11 @@
+<?php
+  $mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+ 
+  $stmt=$mydb->prepare("select continentcode, continentname  ".
+                       "from continents ".
+                       "order by continentname" 
+                      );
+  $stmt->execute();
+  $result=$stmt->fetchAll();
+  echo json_encode($result);
+?>
