@@ -1,0 +1,170 @@
+<html>
+<head>
+    <style>
+        .leftcol {
+            display: inline-block;
+            font-weight: bold;
+            width: 150px;
+            text-align: right;
+        }
+        .rightcol {
+            display: inline-block;
+        }
+        #txtarea {
+            margin-top: 20px;
+            font-weight: bold;
+            color: blue;
+        }
+    </style>
+    <script>
+        function loanCalculation() {
+            var loanAmount;
+            var period;
+            var annualInterest;
+            var payback;
+            var txtarea= "";
+
+            loanAmount= parseFloat(document.getElementById("loanamount").value);
+            period= document.getElementById("period").value;
+            annualInterest= parseFloat(document.getElementById("annualinterest").value)/100;
+            payback= parseFloat(document.getElementById("payback").value);            
+            document.getElementById("tablesec").style.display="none";
+            document.getElementById("changehere").innerHTML = "";
+            document.getElementById("txtarea").innerHTML = "";
+            
+                      
+            if(!loanAmount || loanAmount<=0 || !annualInterest || !payback || payback<=0) 
+            {
+                txtarea="Please enter a valid loan amount greater than 0.";
+                document.getElementById("changehere").innerHTML= "";
+                document.getElementById("txtarea").innerHTML=txtarea;
+                return; 
+            }
+            document.getElementById("tablesec").style.display="table";
+
+            var periodsec;
+            if(period== "annual") {
+                periodsec= 1; 
+            }else if(period== "biannual") {
+                periodsec= 2; 
+            }else if(period== "quarterly") {
+                periodsec= 4; 
+            }else if(period == "monthly") { 
+                periodsec = 12;
+            }
+
+
+            var countperiod= 0;
+            var amtremaining= loanAmount;
+            var addinterest= annualInterest/periodsec;
+            var loan=[];
+            while(amtremaining >0 && countperiod <1000) {
+                countperiod++;
+                var interest= amtremaining*addinterest;
+                var dueInterest= amtremaining+interest;
+                if(payback<= interest) {
+                    txtarea = "Interest payment is greater than or equal to actual payment. Loan will never be repaid.";
+                    document.getElementById("txtarea").innerHTML=txtarea;
+                    return;
+                }
+
+                var afterpay=dueInterest-payback;
+                if(afterpay< 0) {
+                    afterpay=0;
+                }
+
+                var loanData={ countperiod: countperiod,
+                    amtremaining: amtremaining.toFixed(2),
+                    dueInterest: dueInterest.toFixed(2),
+                    afterpay: afterpay.toFixed(2)
+                };
+                loan[loan.length] =loanData;
+                amtremaining =afterpay;
+            }
+
+            
+            for(var x = 0; x<loan.length; x++) {
+                var rowobj = document.createElement("tr");
+                var cellobj = document.createElement("td");
+                cellobj.style = "vertical-align: top; text-align: right;";
+                cellobj.innerHTML = loan[x].countperiod;
+                rowobj.appendChild(cellobj);
+
+                cellobj = document.createElement("td");
+                cellobj.style = "vertical-align: top; text-align: right;";
+                cellobj.innerHTML = loan[x].amtremaining;
+                rowobj.appendChild(cellobj);
+
+                cellobj = document.createElement("td");
+                cellobj.style = "vertical-align: top; text-align: right;";
+                cellobj.innerHTML = loan[x].dueInterest;
+                rowobj.appendChild(cellobj);
+
+                cellobj = document.createElement("td");
+                cellobj.style = "vertical-align: top; text-align: right;";
+                cellobj.innerHTML = loan[x].afterpay;
+                rowobj.appendChild(cellobj);
+
+                document.getElementById("changehere").appendChild(rowobj);
+            }
+            var allyears= countperiod/periodsec;
+            txtarea= "You will pay off the loan in " + Math.ceil(allyears) + " years.";
+            document.getElementById("txtarea").innerHTML= txtarea;
+        }
+
+    </script>
+</head>
+<body>
+    <form>
+        <div class="leftcol">
+            <label for="loanamount">Loan Amount:</label>
+        </div>
+        <div class="rightcol">
+            <input type="number" id="loanamount" oninput="loanCalculation()">
+        </div>
+        <br>
+
+        <div class="leftcol">
+            <label for="period">Period:</label>
+        </div>
+        <div class="rightcol">
+            <select name="period" id="period" onchange="loanCalculation()">
+                <option value="annual" selected>Annual</option>
+                <option value="biannual">Biannual</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </div>
+        <br>
+
+        <div class="leftcol">
+            <label for="annualinterest">Annual Interest:</label>
+        </div>
+        <div class="rightcol">
+            <input type="number" id="annualinterest" style="width: 50px;" oninput="loanCalculation()">%
+        </div>
+        <br>
+
+        <div class="leftcol">
+            <label for="payback">Payback per period:</label>
+        </div>
+        <div class="rightcol">
+            <input type="number" id="payback" style="width: 70px;" oninput="loanCalculation()">
+        </div>
+        <br>
+
+        <table border="1" id="tablesec" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Amount Remaining</th>
+                    <th>Add Interest</th>
+                    <th>After Payment</th>
+                </tr>
+            </thead>
+            <tbody id="changehere"></tbody>
+        </table>
+        <div id="txtarea"></div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: black;
+            color: lightgreen;
+            font-family: Arial, sans-serif;
+        }
+        #searchfield {
+            position: relative;
+            top: 40px; 
+        }
+        #dataentry {
+            position: relative;
+            top: 30px; 
+        }
+        h1 {
+            font-family: Trebuchet ms, Verdana, Myriad Web, Syntax, sans-serif;
+            color: white;
+            margin-bottom: 5px;
+            background-color: black;  
+            margin-left: 450px; 
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: black;  
+            border-radius: 8px;
+        }
+        .formfield {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 5px;
+        }
+        .leftcol {
+            width: 180px;
+            text-align: right;
+            padding-right: 15px;
+            font-weight: bold;
+        }
+        .radiosec {
+            margin-left: 195px;
+        }
+        .buttonsec {
+            display: flex;
+            justify-content: space-between; 
+            margin-right: 80px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #444;
+            color: white;
+            border: none;
+        }
+        .buttonsec button:disabled {
+            opacity: 0.5;
+        }
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .rightcol {
+            color: red;
+            text-align: left;
+            margin-left: 10px; 
+        }
+    </style>
+    <script>
+        
+        function savebuttonfctn() {
+            var pci= document.getElementById('pci').value;
+            var statepop= document.getElementById('statepop').value;
+            var errormsgs= false;
+            var regionselect= false;
+            var regionRadios= document.getElementsByName('region');
+                for(var i=0; i<regionRadios.length; i++) {
+                    if(regionRadios[i].checked) {
+                    regionselect = true;
+                    break; }
+            }
+
+            if(pci<0) {
+                document.getElementById('pcierrormsg').innerHTML= "Must have a PCI greater than or equal to 0!";
+                errormsgs = true;
+            }else{
+                document.getElementById('pcierrormsg').innerHTML= "";
+            }
+
+            if(statepop< 0) {
+                document.getElementById('poperrormsg').innerHTML= "Must have a population greater than or equal to 0!";
+                errormsgs = true;
+            } else {
+                document.getElementById('poperrormsg').innerHTML= "";
+            }
+
+            var saveButton = document.getElementById('saveButton');
+                if(errormsgs) {
+                    saveButton.disabled = true;
+                } else if(!regionselect) {
+                    saveButton.disabled = true;
+                } else {
+                    saveButton.disabled = false;
+                }
+        }
+
+        function regionsec() {
+            var regionData=document.getElementById('regiondata');
+            var xhttp=new XMLHttpRequest();
+            xhttp.onload=function() {
+                var regions = JSON.parse(this.responseText);
+                regionData.innerHTML = ''; 
+                for (var i=0; i<regions.length; i++) {
+                    var radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'region';
+                    radio.value = regions[i].region;
+                    radio.id = 'region' + i;
+                    radio.setAttribute('onchange','savebuttonfctn()');
+                    
+                    var label=document.createElement('label');
+                    label.htmlFor = 'region' + i;
+                    label.innerHTML = regions[i].region;
+
+                    var br = document.createElement('br'); 
+
+                    regionData.appendChild(radio);
+                    regionData.appendChild(label);
+                    regionData.appendChild(br);
+                }
+            };
+            xhttp.open("GET", "regionsdata.php", true);
+            xhttp.send();
+        }
+
+
+        function byabbreviationfuctn() {
+            var stateabbrev=document.getElementById("stateabbrev").value;
+            if(stateabbrev.length > 0) {
+                var xhttp=new XMLHttpRequest();
+                xhttp.onload = function() {
+                    var data = JSON.parse(this.responseText);
+                        
+                    if(data){
+                        if(data.success){
+                            document.getElementById('abbrev').innerHTML = stateabbrev.toUpperCase();
+                            document.getElementById('state').innerHTML = data.state;
+                            document.getElementById('pci').value = data.pci;
+                            document.getElementById('statepop').value = data.population;
+                            document.getElementById('abbreverrormsg').innerHTML = ""; 
+                            var regionRadios = document.getElementsByName('region');
+                            for(var i = 0; i<regionRadios.length; i++) {
+                                if(regionRadios[i].value === data.region) {
+                                    regionRadios[i].checked = true;
+                                }
+                            }
+                            enabledisable('dataentry');
+                        } else {
+                            document.getElementById('abbreverrormsg').innerHTML = "No matching state!";
+                        }
+                    }
+                };
+                xhttp.open("GET", "search_state.php?abbreviation=" + stateabbrev, true);
+                xhttp.send();
+            }
+        }
+
+        function bystatenamefunct() {
+            var statename=document.getElementById("statename").value;
+            if(statename.length > 0){
+                var xhttp= new XMLHttpRequest();
+                    xhttp.onload= function() {
+                    var data= JSON.parse(this.responseText);
+            if(data){
+                if (data.success) {
+                document.getElementById('abbrev').innerHTML = data.abbreviation? data.abbreviation.toUpperCase() : "";
+                document.getElementById('state').innerHTML = data.state;
+                document.getElementById('pci').value = data.pci;
+                document.getElementById('statepop').value = data.population;
+                document.getElementById('abbreverrormsg').innerHTML = ""; 
+                var regionRadios = document.getElementsByName('region');
+                for(var i = 0; i<regionRadios.length; i++) {
+                    if (regionRadios[i].value === data.region) {
+                        regionRadios[i].checked = true;
+                    }
+                }
+                enabledisable('dataentry');
+            } else {
+                document.getElementById('abbreverrormsg').innerHTML = "No matching state!";
+            }
+            }
+        };
+        xhttp.open("GET", "search_state.php?statename=" + statename, true);
+        xhttp.send();
+    }
+}
+
+        
+
+        function cancelfunct() {
+            if (confirm("Really want to cancel?")) {
+                document.getElementById('abbrev').innerHTML = '';
+                document.getElementById('state').innerHTML = '';
+                document.getElementById('pci').value = '';
+                document.getElementById('statepop').value = '';
+                var regionRadios = document.getElementsByName('region');
+                for (var i = 0; i < regionRadios.length; i++) {
+                regionRadios[i].checked = false;
+        }
+                enabledisable('searchfield');
+            }
+        }
+
+        function enabledisable(enableform) {
+            var searcharea = document.getElementById('searchfield');
+            var dataentryarea = document.getElementById('dataentry');
+            if (enableform === 'dataentry') {
+                searcharea.classList.add('disabled');
+                dataentryarea.classList.remove('disabled');
+            } else {
+                dataentryarea.classList.add('disabled');
+                searcharea.classList.remove('disabled');
+            }
+        }
+
+        function statelistfunct() {
+            var xhttp = new XMLHttpRequest();
+                xhttp.onload = function() {
+                    var states = JSON.parse(this.responseText);
+                    var statedatalist = document.getElementById("stateList");
+                    statedatalist.innerHTML = "";  
+                for (var i = 0; i < states.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = states[i];
+                    statedatalist.appendChild(option);
+                }
+        };
+        xhttp.open("GET", "statesdata.php", true);
+        xhttp.send();
+        }
+
+        
+
+        function savebtn(action) {
+            action.preventDefault(); 
+            var selectedRegion = "";
+            var regionRadios = document.getElementsByName("region");
+                for (var i = 0; i < regionRadios.length; i++) {
+                    if (regionRadios[i].checked) {
+                        selectedRegion = regionRadios[i].value;
+                    break;
+                }
+            }
+            var data = {
+                    abbreviation: document.getElementById("abbrev").textContent,
+                    state: document.getElementById("state").textContent,
+                    pci: document.getElementById("pci").value,
+                    statepop: document.getElementById("statepop").value,
+                    region: selectedRegion
+            };
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+            var response = JSON.parse(this.responseText);
+            if (response.success) {
+                alert("Data saved successfully!");
+                enabledisable("searchfield");
+            } else{
+                alert("Error while saving data: " +(response.error || "Please try again"));
+            }
+        };
+
+            xhttp.open("POST", "save_state.php", true);
+            xhttp.send(JSON.stringify(data)); 
+    }
+
+        window.onload = function() {
+            regionsec(); 
+            statelistfunct();
+        }
+ </script>
+</head>
+
+<body>
+
+    <div id="searchfield">
+        <h1>Search</h1>
+        <form>
+            <div class="formfield">
+                <div class="leftcol">By Abbreviation:</div>
+                <div class="middlecol">
+                    <input type="text" id="stateabbrev" style="width: 50px;" oninput="byabbreviationfuctn()" />
+                </div>
+                <div class="rightcol" id="abbreverrormsg"></div>
+            </div>
+
+            <div class="formfield" id="stateNameContainer">
+                <div class="leftcol">By State Name:</div>
+                <div class="middlecol">
+                    <input type="text" id="statename" list="stateList"  oninput="bystatenamefunct()" />
+                    <datalist id="stateList"></datalist>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div id="dataentry" class="disabled">
+        <h1>Data Entry</h1>
+        <form onsubmit="savebtn(event)" >
+            <div class="formfield">
+                <div class="leftcol">Abbrev:</div>
+                <div class="middlecol"><span id="abbrev"></span></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">State:</div>
+                <div class="middlecol"><span id="state"></span></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="pci">Per Capita Income:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="pci" name="pci" oninput="savebuttonfctn()" /> 
+                </div>
+                <div class="rightcol" id="pcierrormsg"></div>
+            </div>
+
+            <div class="formfield">
+                <div class="leftcol">
+                    <label for="statepop">Population:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="number" id="statepop" name="statepop"  oninput="savebuttonfctn()" />
+                </div>
+                <div class="rightcol" id="poperrormsg"></div>
+            </div>
+
+            
+                <div class="leftcol">Region:</div>
+                <div class="radiosec" id="regiondata"></div>
+            
+
+            <div class="buttonsec">
+                <button type="button" onclick="cancelfunct()">Cancel</button>
+                <button type="submit" id="saveButton" disabled>Save</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

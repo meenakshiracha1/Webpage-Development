@@ -1,0 +1,144 @@
+<html>
+    <head>
+        <style>
+            .leftcol{
+                display: inline-block;
+                width: 200px;
+                text-align: right;
+                vertical-align: top;
+                font-weight: bold;
+            }
+            .middlecol{
+                display: inline-block;
+                width: 250px;
+            }
+            .rightcol{
+                display: inline-block;
+                width: 200px;
+                vertical-align: top;
+            }
+        </style>
+        <script>
+            function showval(radioname, putwhere){
+                var theradiolist=document.getElementsByName(radioname);
+                var howmany=theradiolist.length;
+                var x=0;
+                var ischecked=false;
+                while(x<howmany && !ischecked){
+                    ischecked=theradiolist.item(x).checked;
+                    if(!ischecked)
+                    x++;
+                }
+                if(ischecked)
+                putwhere.innerHTML="The value of "+radioname+" is: "+theradiolist.item(x).value;
+            }
+
+            function populateradio(){
+                const xhttp=new XMLHttpRequest();
+                xhttp.onload=function(){
+                    var bookcatarray=JSON.parse(this.responseText);
+                    dbgoeshere.innerHTML="";
+                    var x=0;
+                    for(x=0;x<bookcatarray.length;x++){
+                        var theradio=document.createElement("input");
+                        theradio.type="radio";
+                        theradio.name="radiofive";
+                        theradio.id="radiofive"+x;
+                        theradio.value=bookcatarray[x].category_code;
+                        theradio.setAttribute("onclick","showval('radiofive',radiofivedisplay);");
+                        dbgoeshere.appendChild(theradio);
+                        var thelabel=document.createElement("label");
+                        thelabel.htmlFor="radiofive"+x;
+                        thelabel.innerHTML=bookcatarray[x].category_name;
+                        dbgoeshere.appendChild(thelabel);
+                        dbgoeshere.innerHTML+="<br />";
+                    }
+                }
+                xhttp.open("GET","bookcat.php",true);
+                xhttp.send();
+            }
+        </script>
+    </head>
+    <body onload="showval('radioone',radioonedisplay);populateradio();">
+        <form>
+            <div class="leftcol">Label</div>
+            <div class="middlecol" style="font-weight: bold;">Control </div>
+            <div class="rightcol" style="font-weight: bold;">Value</div><br/>
+
+            <div class="leftcol">
+                First Example Radio Button:
+            </div>
+                <div class="middlecol">
+                    <input type="radio" name="radioone" id="radioone1" value="1" onclick="showval('radioone',radioonedisplay);"/>
+                    <label for="radioone1">First option</label><br/>
+                    <input type="radio" name="radioone" id="radioone2" value="2" onclick="showval('radioone',radioonedisplay);"/>
+                    <label for="radioone2">Second option</label><br/>
+                    <input type="radio" name="radioone" id="radioone3"  value="3" onclick="showval('radioone',radioonedisplay);" checked/>
+                    <label for="radioone3">Third option</label><br/>
+                </div>
+                <div class="rightcol" id="radioonedisplay"></div><br/>
+
+
+
+            <div class="leftcol">
+                Second and Third Radio Buttons:
+            </div>
+                <div class="middlecol">
+                    <input type="radio" name="radiotwo" id="radiotwo1" value="1" onclick="showval('radiotwo',radiotwodisplay);"/>
+                    <label for="radiotwo1">Second Radio First option</label><br/>
+                    <input type="radio" name="radiothree" id="radiothree1" value="1" onclick="showval('radiothree',radiothreedisplay);"/>
+                    <label for="radiothree1">Third Radio First option</label><br/>
+                    <input type="radio" name="radiotwo" id="radiotwo2"  value="2" onclick="showval('radiotwo',radiotwodisplay);" />
+
+                    <label for="radiotwo2">Second Radio Second option</label><br/>
+                    <input type="radio" name="radiothree" id="radiothree2" value="2" onclick="showval('radiothree',radiothreedisplay);"/>
+                    <label for="radiothree2">Third Radio Second option</label><br/>
+                </div>
+
+                <div class="rightcol">
+                    <span id="radiotwodisplay"></span><br/>
+                    <span id="radiothreedisplay"></span>
+                </div><br/>
+
+
+                
+
+
+                <!-- added fourth -->
+                <div class="leftcol">
+                Fourth Radio Buttons:
+            </div>
+                <div class="middlecol">
+                    <input type="radio" name="radiofour" id="radiofour1" value="one" onclick="showval('radiofour',radiofourdisplay);"/>
+                    <label for="radiofour1">First option</label><br/>
+                    <input type="radio" name="radiofour" id="radiofour2" value="two" onclick="showval('radiofour',radiofourdisplay);"/>
+                    <label for="radiofour2">Second option</label><br/>
+                    <input type="radio" name="radiofour" id="radiofour3"  value="three" onclick="showval('radiofour',radiofourdisplay);" />
+
+                    <label for="radiofour3">Third option</label><br/>
+                </div>
+
+                <div class="rightcol" id="radiofourdisplay">              
+                </div><br/>
+
+
+                <div class="leftcol">Database radio button:</div>
+                <div class="middlecol" id="dbgoeshere"></div>
+                <div class="rightcol" id="radiofivedisplay"></div><br>
+
+                <div class="leftcol">
+                    <label for="checkboxone">Simple checkbox:</label>
+                </div>
+                <div class="middlecol">
+                    <input type="checkbox" id="checkboxone" onclick="if(checkboxone.checked)
+                    checkboxonedisplay.innerHTML='Y';
+                    else
+                    checkboxonedisplay.innerHTML='N';"/>
+                    <label for="checkboxone">I love making lots of money</label>
+                </div>
+                <div class="rightcol" id="checkboxonedisplay">N</div><br/>
+                    
+        </form>
+    </body>
+    
+</html>

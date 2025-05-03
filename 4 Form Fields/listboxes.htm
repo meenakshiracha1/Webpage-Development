@@ -1,0 +1,147 @@
+<html>
+    <head>
+        <title></title>
+        <style>
+            .leftcol{
+                display: inline-block;
+                width: 150px;
+                text-align: right;
+                vertical-align: top;
+                font-weight: bold;
+            }
+            .middlecol{
+                display: inline-block;
+                width: 250px;
+            }
+            .rightcol{
+                display: inline-block;
+                width: 150px;
+                vertical-align: top;
+            }
+        </style>
+        <script>
+            function showselectedvalues(whichcontrol, whichdisplay){
+                var x=0;
+                var displayval="";
+                for(x=0;x<whichcontrol.options.length;x++){    //multiple options there 
+                    if(whichcontrol.options[x].selected){
+                        if(displayval.length>0){
+                            displayval+=", ";
+                        }
+                        displayval+=whichcontrol.options[x].value;
+                    }
+                }
+                whichdisplay.innerHTML=displayval;
+            }
+
+            var boxarray=[
+                {value: 0, displayval: "First", side: "L"}, //side is going to determine whether the option appears on the left or right.
+                {value: 1, displayval: "Second", side: "L"},
+                {value: 2, displayval: "Third", side: "L"},
+                {value: 3, displayval: "Fourth", side: "L"},
+                {value: 4, displayval: "Fifth", side: "L"},
+            ];
+
+            function displaybox(){
+                var x=0;
+                leftbox.innerHTML="";
+                rightbox.innerHTML="";
+                for(x=0; x<boxarray.length;x++){
+                    var boxoption=document.createElement("option");
+                    boxoption.value=boxarray[x].value;
+                    boxoption.innerHTML=boxarray[x].displayval;
+                    if(boxarray[x].side=="L")
+                        leftbox.appendChild(boxoption);
+                    else
+                        rightbox.appendChild(boxoption);                  
+                }
+            }
+
+            function changeside(whichbox, changevalue){
+                var x=0;
+                for(x=0;x<whichbox.length;x++){
+                    if(whichbox.options[x].selected)
+                        boxarray[whichbox.options[x].value].side=changevalue;
+                }
+                displaybox();
+            }
+
+            function populatepulldown(){
+                const xhttp=new XMLHttpRequest();
+                xhttp.onload=function(){
+                    var bookcatarray=JSON.parse(this.responseText);
+                    dbpulldown.innerHTML="";
+                    var x=0;
+                    for(x=0;x<bookcatarray.length;x++){
+                        var theoption=document.createElement("option");
+                        theoption.value=bookcatarray[x].category_code;
+                        theoption.innerHTML=bookcatarray[x].category_name;
+                        dbpulldown.appendChild(theoption);
+                    }
+                }
+                xhttp.open("GET", "bookcat.php", true);
+                xhttp.send();
+            }
+
+        </script>
+    </head>
+    <body onload="displaybox();populatepulldown();">
+        <form>
+            <div class="leftcol">
+            <label for="simpbox">A simple listbox:</label>
+            </div>
+            <div class="middlecol">
+            <select id="simpbox" size="4" onchange="showselectedvalues(simpbox,simboxdisplay);">  
+                <option value="1">First</option>
+                <option value="2">Second</option>
+                <option value="3">Third</option>
+                <option value="4">Fourth</option>
+                <option value="5">Fifth</option>
+            </select>
+            </div><div class="rightcol" id="simboxdisplay">
+            
+            </div><br />
+
+            <div class="leftcol">
+            <label for="multbox">A multiple listbox:</label>
+            </div>
+            <div class="middlecol">
+            <select id="multbox" size="4" multiple onchange="showselectedvalues(multbox,multboxdisplay);">  
+                <option value="1">First</option>
+                <option value="2">Second</option>
+                <option value="3">Third</option>
+                <option value="4">Fourth</option>
+                <option value="5">Fifth</option>
+            </select>
+            </div><div class="rightcol" id="multboxdisplay">
+            
+            </div><br />
+
+            <div class="leftcol">
+            Transfer Listboxes:
+            </div>
+            <div class="middlecol">
+            <select id="leftbox" size="4" multiple >  
+               
+            </select>
+            <div style="display: inline-block">
+                <button type="button" onclick="changeside(leftbox,'R');">&gt;&gt;&gt;</button> <!--&gt; and &lt; is a character entity reference for the > and < -->
+                <br><br>
+                <button type="button" onclick="changeside(rightbox,'L');">&lt;&lt;&lt;</button>
+            </div>
+            <select id="rightbox" size="4" multiple>
+            </select>
+            
+            </div><br />
+
+            <div class="leftcol">
+                Database Defined Pulldown:
+            </div>
+            <div class="middlecol">
+                <select id="dbpulldown">
+                </select>
+            </div>
+
+        </form>
+    </body>
+</html>

@@ -1,3 +1,4 @@
+
 <html>
 <head>
     <style>
@@ -63,7 +64,6 @@
                     option.text=regions[i].region;
                     regionlist.appendChild(option);
                 }
-                regionpulldown();
             }
             xhttp.open("GET", "b.php?regions=true", true);
             xhttp.send();
