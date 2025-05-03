@@ -1,0 +1,8 @@
+<?php
+$title=$_REQUEST['title'];
+    $mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+    $stmt = $mydb->prepare("Select DISTINCT emptype.emptypecode, emptype.emptypedesc ". "from employee ". "inner join emptype ". "on employee.emptypecode=emptype.emptypecode ". "order by employee.emptypecode" );
+    $stmt->execute();
+    $result=$stmt->fetchAll();
+    echo json_encode($result);
+?>

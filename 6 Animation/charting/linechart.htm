@@ -1,0 +1,64 @@
+
+<html>
+    <head>
+
+    </head>
+    <body>
+        <form>
+        <canvas id="myChart" width="1000" height="400" style="background: white;"></canvas>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            var ctx=document.getElementById("myChart");
+            var myChart=new Chart(ctx,{ //begin Chart
+                type:'line',
+                data:{
+                    datasets: [
+                        { //begin dataset 1
+                            data: [30,40,20,30,50],
+                            label: "Store 1",
+                            borderColor: "#ff0000",
+                            fill: false
+                        }, //end dataset 1
+                        { //begin dataset2
+                            data: [100,140,50,70,120],
+                            label: "Store 2",
+                            borderColor:"#00ff00",
+                            fill: false
+                        } //begin dataset 2
+                    ] //end datasets
+                },//end data
+                options:{//begin options
+                plugins:{
+                    legend:{
+                        display:true
+                    }
+                },
+                scales:{//begin scales
+                x:{
+                    title:{
+                        display: true,
+                        text: 'Months',
+                        color: 'black'
+                    },
+                    grid:{color: 'black'},
+                    ticks:{color: 'blacks'},
+                    type: 'category',
+                    labels:[1,2,3,4,5],
+                },//end xAxes
+                y:{
+                    title: {
+                        text: 'Quantity',
+                        display:true,
+                        color: 'black'
+                    },
+                    grid:{color: 'black'},
+                    ticks:{color: 'black'},
+                    type: 'linear'
+                }//end yAxes
+                }//end scales
+            } //end options
+            });// endChart
+        </script>
+    </body>
+</html>

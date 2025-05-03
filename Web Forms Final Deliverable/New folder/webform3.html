@@ -1,0 +1,241 @@
+<!doctype html>
+<html>
+    <head>
+        <style>
+            .leftcol{
+                display: inline-block;
+                font-weight:bold;
+                width:200px;
+                text-align:left;
+            }
+            .rightcol{
+                display:inline-block;
+            }
+            .checkarea {
+                display: inline-block;
+                font-size: large;
+            }
+        </style>
+
+    </head>
+    <body onload="continentpulldown();tradeagreementpulldown();displayContries('');" >
+     <form>
+            <div class="leftcol">
+                <input type="radio" id="byName" name="own" value="By Name:" onclick="enableordisable()" checked />
+                <label for="byName">By Name:</label>
+            </div>
+            <div class="rightcol">
+                <input  id="nametextbox" type="text" min="0" required onKeyUp="displayContries(nametextbox.value);"/>
+            </div><br />
+            
+            
+            <div class="leftcol">
+                <input type="radio" id="byContinent" name="own" value="By Continent:" onclick="enableordisable()">
+                <label for="byContinent">By Continent:</label>
+            </div>
+            <div class="rightcol">
+               <select id="byContinenttextbox" onchange="continentsort(byContinenttextbox.value);" disabled>
+              </select>
+            </div><br />
+            
+            
+         <div class="leftcol">
+                <input type="radio" id="byTrade" name="own" value="By Trade Agreement:" onclick="enableordisable()">
+                <label for="byTrade">By Trade Agreement:</label>
+            </div>
+            <div class="rightcol">
+               <select id="byTradeAgreementtextbox" onchange="agreementsort(byTradeAgreementtextbox.value);" disabled >
+              </select>
+            </div><br /><br />
+            <hr>
+
+
+      </form>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Country Name</th>
+                        <th>Population</th>
+                        <th>Land Area(km<sup>2</sup>)</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="tabledata">
+                    
+                </tbody>
+            </table>
+       <script>
+        //   let byName = document.getElementById("byName")
+        //   let byContinent = document.getElementById("byContinent")
+        //   let byTradeAgreement = document.getElementById("byTradeAgreement")
+        //  byName.addEventListener('input', checkFormValidity);
+        //  byContinent.addEventListener('change', checkFormValidity);
+        //  byTradeAgreement.addEventListener('change', checkFormValidity);
+ 
+
+        // function checkFormValidity() {
+        //   console.log("byName",byName.value)
+        //   console.log("byContinent",byContinent.value)
+        //   console.log("byTradeAgreement",byTradeAgreement.value)
+        // }
+        
+        
+        //enable and disable for radio
+          function enableordisable(){
+            var byName = document.getElementById("byName");
+            var byContinent = document.getElementById("byContinent");
+            var byTrade = document.getElementById("byTrade");
+            var nametextbox = document.getElementById("nametextbox");
+            var byContinenttextbox = document.getElementById("byContinenttextbox");
+            var byTradeAgreementtextbox = document.getElementById("byTradeAgreementtextbox");
+            if(byName.checked){
+                nametextbox.disabled=false;
+                byContinenttextbox.disabled = true;
+                byTradeAgreementtextbox.disabled = true;
+            }
+            else if(byContinent.checked){
+                nametextbox.disabled=true;
+                byContinenttextbox.disabled = false;
+                byTradeAgreementtextbox.disabled = true;
+            }else{
+                nametextbox.disabled=true;
+                byContinenttextbox.disabled = true;
+                byTradeAgreementtextbox.disabled = false;
+            }
+        }
+        
+        //extracted data from country php 
+        function displayContries(value){
+               const xhttp=new XMLHttpRequest();
+                xhttp.onload=function(){
+                    var sort=this.responseText;
+                    //more JavaScript code will go here
+                    var x=0;
+                    var rowobj=null;
+                    var cellobj=null;
+                    tabledata.innerHTML="";
+                    var countryarray=JSON.parse(sort);
+                    for(x=0;x<countryarray.length;x++){
+                            rowobj=document.createElement("tr");
+                            cellobj=document.createElement("td");
+                            cellobj.innerHTML=countryarray[x].countryname;
+                            rowobj.appendChild(cellobj);
+                            cellobj=document.createElement("td");
+                            cellobj.innerHTML=countryarray[x].population;
+                            rowobj.appendChild(cellobj);
+                            cellobj=document.createElement("td");
+                            cellobj.innerHTML=countryarray[x].landarea;
+                            rowobj.appendChild(cellobj);
+                            tabledata.appendChild(rowobj);
+                        }
+                }
+                    xhttp.open("GET","country1.php?title="+value,true);
+                    xhttp.send();
+            }
+        
+       //extracted data from continent php 
+        function continentpulldown(){
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function(){
+                    var continentarray = JSON.parse(this.responseText);
+                    byContinenttextbox.innerHTML="";
+                    var x=0;
+                    var option1=document.createElement("option");
+                    option1.innerHTML="All";
+                    option1.value="ALL";
+                    byContinenttextbox.appendChild(option1);
+                    for (x=0; x<continentarray.length; x++){
+                        var option1=document.createElement("option");
+                        option1.value=continentarray[x].continentcode;
+                        option1.innerHTML=continentarray[x].continentname;
+                        byContinenttextbox.appendChild(option1);
+                    }
+                }
+                xhttp.open("GET", "continent.php", true);
+                xhttp.send();
+            }
+        
+        
+        //extracted data from agreement php 
+        function tradeagreementpulldown(){
+                const xhttp = new XMLHttpRequest();
+                xhttp.onload = function(){
+                    var agreementarray = JSON.parse(this.responseText);
+                    byTradeAgreementtextbox.innerHTML="";
+                    var x=0;
+                    var option2=document.createElement("option");
+                    option2.innerHTML="All";
+                    byTradeAgreementtextbox.appendChild(option2);
+                    for (x=0; x<agreementarray.length; x++){
+                        var option2=document.createElement("option");
+                        option2.value=agreementarray[x].agreecode;
+                        option2.innerHTML=agreementarray[x].agreename;
+                        byTradeAgreementtextbox.appendChild(option2);
+                    }
+                }
+                xhttp.open("GET", "agreement.php", true);
+                xhttp.send();
+            }
+        function continentsort(value1){
+            const xhttp=new XMLHttpRequest();
+                xhttp.onload=function(){
+                    var sort=this.responseText;
+                    var x=0;
+                    var rowobj=null;
+                    var cellobj=null;
+                    var con=JSON.parse(sort);
+                    tabledata.innerHTML="";
+                    for(x=0;x<con.length;x++){
+                        rowobj=document.createElement("tr");
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].countryname;
+                        rowobj.appendChild(cellobj);
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].population;
+                        rowobj.appendChild(cellobj);
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].landarea;
+                        rowobj.appendChild(cellobj);
+                        tabledata.appendChild(rowobj);
+                    }
+                }
+                xhttp.open("GET","continentsort.php?title=" +value1,true);
+                xhttp.send();
+            }
+            function agreementsort(value2){
+            const xhttp=new XMLHttpRequest();
+                xhttp.onload=function(){
+                    var sort=this.responseText;
+                    var x=0;
+                    var rowobj=null;
+                    var cellobj=null;
+                    var con=JSON.parse(sort);
+                    tabledata.innerHTML="";
+                    for(x=0;x<con.length;x++){
+                        rowobj=document.createElement("tr");
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].countryname;
+                        rowobj.appendChild(cellobj);
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].population;
+                        rowobj.appendChild(cellobj);
+                        cellobj=document.createElement("td");
+                        // cellobj.style="vertical-align:top";
+                        cellobj.innerHTML=con[x].landarea;
+                        rowobj.appendChild(cellobj);
+                        tabledata.appendChild(rowobj);
+                    }
+                }
+                xhttp.open("GET","agreementsort.php?title=" +value2,true);
+                xhttp.send();
+            }
+  </script>
+    </body>
+ 
+</html>

@@ -1,0 +1,23 @@
+<html>
+    <body>
+        <form>
+        <canvas id="myChart" width="1000" height="400" style="background: white;"></canvas>
+        </form>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            var ctx=document.getElementById("myChart");
+            var myChart=new Chart(ctx,{ //begin Chart
+                type:'pie',
+                data:{
+                    labels: ['Store 1: 10', 'Store 2:20', 'Store 3:30'],
+                    datasets: [
+                        { //begin dataset 1
+                            data: [10,20,30],
+                            backgroundColor: ["#ff0000" ,"#00ff00","#0000ff"]  
+                        } //end dataset 1
+                    ] //end datasets
+                }//end data
+            });// endChart
+        </script>
+    </body>
+</html>

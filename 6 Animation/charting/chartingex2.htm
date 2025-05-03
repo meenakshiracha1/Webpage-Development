@@ -1,0 +1,335 @@
+
+<!doctype html>
+<html>
+  <head>
+    <link href="cssex.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      function controlboxes(whichchart)
+      {
+          if (whichchart=='p')
+            var ispie=true;
+          for (x=0; x<6; x++){
+              document.getElementById("param"+x).disabled=ispie;
+              document.getElementById("picker"+x).disabled=ispie;
+              if (x % 2==0)
+                document.getElementById("value"+x).disabled=!ispie;
+                if(x<2)
+                document.getElementById("piepick"+x).disabled=!ispie;
+            }
+            if(ispie)
+            drawpie();
+        else
+        drawbarorline(whichchart);
+      }
+      
+      const storeparams=[1,2,1,2,1,2];
+      const stattype=['drink','drink','food','food','complaints','complaints'];
+      var thechart=null;
+      var bllabeldata=[];
+     
+      
+      function loadlabels(){
+          const xhttp=new XMLHttpRequest();
+          xhttp.onload=function(){
+              var monthdata = JSON.parse(this.responseText);
+              for(x=0;x<monthdata.length;x++)
+              bllabeldata.push(monthdata[x].storemonth);
+          }
+          xhttp.open("GET","storemonth.php",true);
+          xhttp.send();
+      }
+      function drawpie(){
+          drawhere.innerHTML="";
+          if(!(thechart==null))
+          thechart.destroy();
+          thechart=new Chart(drawhere,{//begin Chart
+          type: 'pie',
+          data:{
+              labels:['Store 1','Store 2'],
+              datasets:[
+                  {//begin dataset 1
+                      data:[],
+                      backgroundColor:[piepick0.value,piepick1.value]
+                  }//end dataset 1
+                  ]//end datasets
+          }//end data
+              
+          });//end Chart
+      }
+      
+      
+      
+      
+      function drawbarorline(whichtype){
+          drawhere.innerHTML="";
+          if(!(thechart==null))
+          thechart.destroy();
+          var thetype='';
+          if(whichtype=='1')
+          thetype='line';
+          else
+          thetype='bar';
+          thechart=new Chart(drawhere,{//begin Chart
+          type: thetype,
+          data:{
+              labels:bllabeldata,
+              datasets:[]
+          },//end data
+          options:{// begin options
+          scales:{//begin scales
+          x:{
+              display:true,
+              title:{//begin scaleLabel
+              display: true,
+              text: "Month"
+                  
+              }// end scaleLabel
+          },//end XAxes
+          y:{
+              display:true,
+              title:{//begin scaleLabel
+              display: true,
+              text: 'Quantity'
+                  
+              }// end scaleLabel
+          }//end yAxes
+          }//end scales
+          }   
+          });//end Chart
+          refreshbarline();
+      }
+      
+
+      function dopie(){
+        var x=0;
+        var haschecked=false;
+        while (x<3 && ! haschecked)
+          if (document.getElementsByName("whichpie").item(x).checked)
+            haschecked=true;
+          else
+            x++;
+        if (x<3){
+          thechart.options.plugins.title.text=stattype[x*2].toUpperCase();      
+          thechart.options.plugins.title.display=true;
+          const xhttp = new XMLHttpRequest();
+          xhttp.onload = function() {
+                    var phpdata = JSON.parse(this.responseText);
+                    thechart.data.datasets[0].data=[];
+                    for (x=0; x<phpdata.length;x++)
+                      thechart.data.datasets[0].data.push(phpdata[x].sm);
+                    thechart.update();
+                 }
+          xhttp.open("GET", "piestats.php?stattype="+stattype[x*2], true);
+          xhttp.send();            
+
+        }
+      }
+      
+      function dopiecolor(whichcolor){
+          thechart.data.datasets[0].backgroundColor[whichcolor]=document.getElementById("piepick"+whichcolor).value;
+          thechart.update();
+      }
+
+
+            var bllinedata=[,,,,,];
+      function dobarline(whichcheck){
+          
+          if (document.getElementById("param"+whichcheck).checked){
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                    var phpdata = JSON.parse(this.responseText);
+                    var linedata=[];
+                    for (x=0; x<phpdata.length;x++)
+                      linedata.push(phpdata[x].stat);
+                    bllinedata[whichcheck]=linedata;
+                    refreshbarline();
+                 }
+            xhttp.open("GET", 
+                       "storestats.php?store="+storeparams[whichcheck]+"&stattype="+stattype[whichcheck], 
+                       true 
+                      );
+            xhttp.send();            
+          }
+          else
+            refreshbarline();
+      }
+      
+      function refreshbarline(){
+          var x=0;
+          var y=0;
+          var chartdatatsruc=null;
+          thechart.data.datasets=[];
+          for (x=0; x<storeparams.length; x++){
+              if (document.getElementById("param"+x).checked){
+                  if (barchart.checked)
+                    chartdatastruc={data: [], 
+                                    label: 'Store '+storeparams[x]+' '+stattype[x], 
+                                    backgroundColor: document.getElementById("picker"+x).value, 
+                                    fill: true
+                    };
+                  else
+                    chartdatastruc={data: [], 
+                                    label: 'Store '+storeparams[x]+' '+stattype[x], 
+                                    borderColor: document.getElementById("picker"+x).value, 
+                                    fill: false
+                    };
+
+                  chartdatastruc.data=bllinedata[x];
+                  thechart.data.datasets.push(chartdatastruc);
+              }
+          }
+          thechart.update();
+      }
+
+
+    </script>
+    <title>Main Page</title>
+  </head>
+  <body onload="loadlabels()">
+    <form>
+        <div style="display: inline-block; vertical-align: top;">
+            <input type="radio" 
+                   name="whichchart"
+                   id="barchart"
+                   value="b"
+                   onclick="controlboxes('b');"
+            /><label for="barchart">Bar Chart</label>
+            <input type="radio" 
+                   name="whichchart" 
+                   id="linechart"
+                   value="l" 
+                   onclick="controlboxes('l');"
+            /><label for="linechart">Line Chart</label><br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param0" 
+                               value="Y" 
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param0">Include drinks for store 1</label>
+                                              <input type="color"
+                                              id="picker0"
+                                              value="#FF0000"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param1" 
+                               value="Y"
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param1">Include drinks for store 2</label>
+                                              <input type="color"
+                                              id="picker1"
+                                              value="#FFA500"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param2" 
+                               value="Y" 
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param2">Include food for store 1</label>
+                                              <input type="color"
+                                              id="picker2"
+                                              value="#FFFF00"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param3" 
+                               value="Y" 
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param3">Include food for store 2</label>
+                                              <input type="color"
+                                              id="picker3"
+                                              value="#008000"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param4" 
+                               value="Y" 
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param4">Include complaints for store 1</label>
+                                              <input type="color"
+                                              id="picker4"
+                                              value="#0000FF"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+            &nbsp;&nbsp;<input type="checkbox" 
+                               id="param5" 
+                               value="Y" 
+                               onclick="dobarline();"
+                               disabled
+                         /><label for="param5">Include complaints for store 2</label>
+                                              <input type="color"
+                                              id="picker5"
+                                              value="#800080"
+                                              oninput="refreshbarline();"  
+                                              disabled
+                                              />
+                         <br />
+        </div>
+        <div style="display: inline-block; vertical-align: top;">
+            <input type="radio" 
+                   name="whichchart" 
+                   id="piechart"
+                   value="p" 
+                   onclick="controlboxes('p');"
+             /><label for="piechart">Pie Chart</label><br />
+             &nbsp;&nbsp;<input type="radio" 
+                                name="whichpie" 
+                                id="value0"
+                                value="1" 
+                                disabled
+                                onchange="dopie()"
+                         /><label for="value0">Store 1 vs Store 2 Drink Sales</label> 
+                         <br /> 
+             &nbsp;&nbsp;<input type="radio" 
+                                name="whichpie" 
+                                id="value2"
+                                value="2" 
+                                disabled
+                                onchange="dopie()"
+                         /><label for="value2">Store 1 vs Store 2 Food Sales</label>
+                         <br /> 
+             &nbsp;&nbsp;<input type="radio" 
+                                name="whichpie" 
+                                id="value4"
+                                value="3" 
+                                disabled
+                                onchange="dopie()"
+                         /><label for="value4">Store 1 vs Store 2 Complaints</label>
+                         <br /> 
+              Colors: 
+              <input type="color"
+                     id="piepick0"
+                     value="#00FFFF"
+                     oninput="dopiecolor(0);"
+                                         disabled
+              /><label for="piepick0">Store 1</label>
+              <input type="color"
+                     id="piepick1"
+                     value="#FF00FF"
+                     oninput="dopiecolor(1);"
+                                         disabled
+              /><label for="piepick1">Store 2</label>
+
+        </div><br />
+          
+          <canvas id="drawhere" style="height:500px; width:500px; border:1px solid">
+              
+          </canvas>
+       </form>
+  </body>
+</html>

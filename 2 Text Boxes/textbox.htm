@@ -1,0 +1,120 @@
+<html>
+    <head>
+        <title>On Your Own TextBox</title>
+        <script>
+            function usertype() {
+                var inputText = textbox1.value;
+                if (isFlipped) {
+                    reverseText(); 
+                } else {
+                    displayText(inputText); 
+                }
+
+                var button = multbutt;
+                if (inputText.length == 0) {
+                    button.disabled = true;
+                } else {
+                    button.disabled = false;
+                }
+            }
+
+            function color() {
+                var textColor = textbox2.value || "black"; // Default is black
+                var backgroundColor = textbox3.value || "white"; // Default is white
+                displayArea.style.color = textColor;
+                displayArea.style.backgroundColor = backgroundColor;
+            }
+
+            function displayText(text) {
+                displayArea.innerText = text;
+            }
+
+            function reverseText(){
+                var inputText;
+                var lines;
+                var revText = "";
+                inputText = textbox1.value;
+                lines = inputText.split("\n");
+
+                // Reversing each line
+                for (var i = 0; i < lines.length; i++) {
+                    var revLines = ""; 
+                    for (var j = lines[i].length - 1; j >= 0; j--) {
+                        revLines += lines[i][j]; 
+                    }
+                    revText += revLines + "\n"; 
+                }
+                displayText(revText); 
+            }
+
+            var isFlipped = false; 
+            function reverse() {
+                var inputText;
+                inputText = textbox1.value;
+                if (isFlipped) {
+                    displayText(inputText); 
+                    multbutt.innerText = "Flip Opposite";
+                } else {
+                    reverseText();
+                    multbutt.innerText = "Don't Flip"; 
+                }
+                isFlipped = !isFlipped; 
+            }
+        </script>
+        <style>
+            .labels {
+                display: inline-block;
+                font-weight: bold;
+                text-align: right;
+                width: 150px; 
+                vertical-align: top;
+            }
+
+            .textboxes {
+                display: inline-block;
+                margin-left: 10px;
+            }
+
+            #textbox1 {
+                width: 400px;
+                height: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Label and input for Text to display -->
+        <div class="labels">
+            <label for="textbox1">Text to display:</label>
+        </div>
+        <div class="textboxes">
+            <textarea id="textbox1" oninput="usertype(); color();"></textarea>
+        </div><br/>
+
+        <!-- Label and input for Font Color -->
+        <div class="labels">
+            <label for="textbox2">Font Color:</label>
+        </div>
+        <div class="textboxes">
+            <input type="text" value="black" oninput="color()" id="textbox2"/>
+        </div><br/>
+
+        <!-- Label and input for Background Color -->
+        <div class="labels">
+            <label for="textbox3">Background Color:</label>
+        </div>
+        <div class="textboxes">
+            <input type="text" value="white" oninput="color()" id="textbox3"/>
+        </div><br/>
+
+        <!-- Flip Opposite button -->
+        <div class="labels"></div>
+        <div class="textboxes">
+            <button type="button" id="multbutt" name="multbutt" onclick="reverse()" disabled>Flip Opposite</button>
+        </div><br/>
+<hr>
+        <!-- display text -->
+        <div class="textboxes">
+            <div id="displayArea"></div>
+        </div>
+    </body>
+</html>

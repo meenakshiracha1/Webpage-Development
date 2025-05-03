@@ -1,0 +1,23 @@
+<?php
+$title = isset($_REQUEST['title']) ? strtoupper($_REQUEST['title']) : '';
+if (strlen($title) == 0 || $title == 'ALL'){
+$title='%';
+$mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+$stmt=$mydb->prepare("SELECT countryname, population, landarea FROM countries ORDER BY countryname "
+                    );
+}
+else{
+$title = ($title == 'ALL') ? '%' : $title;
+$mydb = new PDO('mysql:host=localhost; dbname=id21172425_amazonia', 'id21172425_amazonia', 'Denny@123');
+$stmt=$mydb->prepare("Select countries.countryname, population, landarea ".
+                     "from countries ".
+                     "inner join countryagreement ".
+                     "on countries.countryname=countryagreement.countryname ".
+                     "where agreecode = '$title' ".
+                     "order by 1 "
+                    );
+}
+$stmt->execute();
+$result=$stmt->fetchAll();
+echo json_encode($result);
+?>

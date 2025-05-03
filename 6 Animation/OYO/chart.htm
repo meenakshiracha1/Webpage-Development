@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .leftbar {
+            border: 2px solid #fff;
+            width: 400px;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            background-color: #107896;
+            color: white;
+        }
+
+        #generate-chart {
+            background-color: #107896;
+            padding: 20px;
+            margin-left: 450px; /* To account for the fixed left bar */
+        }
+
+        .chartleftcol {
+            display: inline-block;
+            text-align: right;
+            width: 120px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .chartmiddlecol {
+            display: inline-block;
+            text-align: left;
+            width: 150px;
+        }
+
+        h2 {
+            font-family: Trebuchet ms, Verdana, sans-serif;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            background-color: #107896;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input[type="radio"] {
+            width: auto;
+        }
+
+        canvas {
+            background-color: #107896;
+            
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var thechart = null;
+
+        // Pie chart color palette
+        const pieColors = [
+            '#0048BA', '#B0BF1A', '#7CB9E8', '#B284BE', '#72A0C1', '#F0F8FF', '#DB2D43', '#C46210',
+            '#EFDECD', '#9F2B68', '#F19CBB', '#AB274F', '#3B7A57', '#FFBF00', '#9966CC', '#3DDC84'
+        ];
+
+        // Initialize dropdowns
+        function initializeDropdowns() {
+            regionsec();
+            expensesec();
+        }
+
+        // Fetch regions for dropdown
+        function regionsec() {
+            var regionlist = document.getElementById('regionpdown');
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                var regions = JSON.parse(this.responseText);
+                regionlist.innerHTML = '<option value="All">All</option>';
+                regions.forEach(function (region) {
+                    if (region.region.trim() !== "") {
+                        var option = document.createElement('option');
+                        option.value = region.region;
+                        option.textContent = region.region;
+                        regionlist.appendChild(option);
+                    }
+                });
+            };
+            xhttp.open("GET", "region.php?regions=true", true);
+            xhttp.send();
+        }
+
+        // Fetch expenses for dropdown
+        function expensesec() {
+            var expenseslist = document.getElementById('expensesdown');
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                var expenses = JSON.parse(this.responseText);
+                expenseslist.innerHTML = '';
+                expenses.forEach(function (expense) {
+                    var option = document.createElement('option');
+                    option.value = expense.expensecode;
+                    option.textContent = expense.expensename;
+                    if (expense.expensename === "Food and Beverage") {
+                        option.selected = true;
+                    }
+                    expenseslist.appendChild(option);
+                });
+            };
+            xhttp.open("GET", "expenses.php?type=expenses", true);
+            xhttp.send();
+        }
+
+        // Draw the chart dynamically
+        function drawChart(chartType) {
+            var ctx = document.getElementById('chart').getContext('2d');
+            if (thechart) thechart.destroy();
+
+            // Fetch dynamic data for the chart
+            var selectedRegion = document.getElementById('regionpdown').value;
+            var selectedExpense = document.getElementById('expensesdown').value;
+
+            // Example data, replace this with real data fetched from the backend
+            var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado'];
+            var expenses = [1000, 1500, 2000, 2500, 1800, 2200];
+
+            if (chartType === 'bar') {
+                thechart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Expenses (USD)',
+                                data: expenses,
+                                backgroundColor: '#FF0000'
+                            }
+                        ],
+                        labels: states // X-axis labels
+                    },
+                    options: {
+                        plugins: {
+                            legend: { display: true },
+                            title: {
+                                display: true,
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'States',
+                                    color: 'white'
+                                },
+                                grid: { color: 'white' },
+                                ticks: { color: 'white', autoSkip: false }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Expenses',
+                                    color: 'white'
+                                },
+                                grid: { color: 'white' },
+                                ticks: { color: 'white' }
+                            }
+                        }
+                    }
+                });
+            } else if (chartType === 'pie') {
+                thechart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: states,
+                        datasets: [
+                            {
+                                data: expenses,
+                                backgroundColor: pieColors.slice(0, states.length)
+                            }
+                        ]
+                    },
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Expenses Distribution',
+                                color: 'white'
+                            },
+                            legend: {
+                                labels: {
+                                    color: 'white'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Handle chart type changes
+        function controlboxes(chartType) {
+            drawChart(chartType);
+        }
+    </script>
+</head>
+<body onload="initializeDropdowns()">
+    <div class="leftbar">
+        <h2>Options</h2>
+
+        <div class="chartleftcol">
+            <label for="regionpdown">By Region:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <select id="regionpdown"></select>
+        </div><br>
+
+        <div class="chartleftcol">
+            <label for="expensesdown">Expense:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <select id="expensesdown"></select>
+        </div><br>
+
+        <div class="chartleftcol">
+            <label for="graphtype">Graph Type:</label>
+        </div>
+        <div class="chartmiddlecol">
+            <input type="radio" id="barchart" name="chart" value="bar" onclick="controlboxes('bar')">
+            <label for="barchart">Bar Chart</label><br>
+            <input type="radio" id="piechart" name="chart" value="pie" onclick="controlboxes('pie')">
+            <label for="piechart">Pie Chart</label>
+        </div>
+    </div>
+
+    <section id="generate-chart">
+        <h2>Chart</h2>
+        <canvas id="chart" width="600" height="400"></canvas>
+    </section>
+</body>
+</html>
